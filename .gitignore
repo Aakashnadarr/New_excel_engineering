@@ -1,2 +1,10 @@
 config/*
 venv/*
+token.json/
+__pycache__/
+*.pyc
+*.sqlite3
+.DS_Store
+.idea/  
+*.log
+*.env
