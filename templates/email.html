@@ -4,94 +4,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Email Listing & Detail</title>
+    <title>Email Inbox</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 
-<body class="bg-slate-50 h-screen flex overflow-hidden font-sans" x-data="emailApp">
+<body class="bg-slate-50 h-screen flex overflow-hidden font-sans" x-data="emailApp()" x-init="initWebSocket()">
 
     <aside class="w-full md:w-96 bg-white border-r border-gray-200 flex flex-col shrink-0">
-        <div class="p-4 border-b border-gray-100 bg-white sticky top-0">
+        <div class="p-4 border-b border-gray-100 bg-white sticky top-0 flex justify-between items-center">
             <h1 class="text-xl font-bold text-gray-800">Inbox</h1>
+            <div class="flex items-center gap-2">
+                <template x-if="loading">
+                    <span class="text-[10px] text-blue-500 font-bold uppercase animate-pulse">Syncing</span>
+                </template>
+                <button @click="refresh()" class="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                    :class="loading ? 'animate-spin text-blue-500' : 'text-gray-500'">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                </button>
+            </div>
         </div>
 
         <div class="flex-1 overflow-y-auto">
             <template x-for="email in emails" :key="email.id">
-                <div @click="selectedEmail = email.id"
-                    :class="selectedEmail === email.id ? 'bg-blue-50 border-l-4 border-blue-600' : 'hover:bg-gray-50 border-l-4 border-transparent'"
+                <div @click="selectedEmail = email"
+                    :class="selectedEmail && selectedEmail.id === email.id ? 'bg-blue-50 border-l-4 border-blue-600' : 'hover:bg-gray-50 border-l-4 border-transparent'"
                     class="p-4 border-b border-gray-100 cursor-pointer transition-all">
                     <div class="flex justify-between items-center mb-1">
-                        <span class="font-bold text-gray-900 text-sm truncate max-w-[160px]" x-text="email.name"></span>
-                        <span class="text-xs text-gray-400 shrink-0 ml-2" x-text="email.time"></span>
+                        <span class="font-bold text-gray-900 text-sm truncate" x-text="email.name"></span>
+                        <span class="text-xs text-gray-400 shrink-0" x-text="email.time"></span>
                     </div>
                     <div class="text-sm font-semibold text-gray-700 truncate" x-text="email.subject"></div>
-                    <div class="text-xs text-gray-500 mt-1 line-clamp-1" x-text="email.subject"></div>
                 </div>
             </template>
         </div>
     </aside>
 
     <main class="flex-1 bg-white flex flex-col overflow-hidden">
-        <template x-for="email in emails" :key="email.id">
-            <div x-show="selectedEmail === email.id" class="h-full flex flex-col p-8 overflow-y-auto">
-
-                <!-- Header -->
+        <template x-if="selectedEmail">
+            <div class="h-full flex flex-col p-8 overflow-y-auto">
                 <div class="border-b border-gray-100 pb-6 mb-6">
-                    <h2 class="text-2xl font-bold text-gray-800 mb-2" x-text="email.subject"></h2>
-                    <div class="flex items-center text-sm text-gray-500">
-                        <span class="font-semibold text-gray-700" x-text="email.from"></span>
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2" x-text="selectedEmail.subject"></h2>
+                    <div class="text-sm text-gray-500">
+                        <span class="font-semibold text-gray-700" x-text="selectedEmail.from"></span>
                         <span class="mx-2">&bull;</span>
-                        <span x-text="email.time"></span>
+                        <span x-text="selectedEmail.time"></span>
                     </div>
                 </div>
 
-                <!-- Body -->
                 <div class="prose prose-blue max-w-none text-gray-700 leading-relaxed whitespace-pre-wrap"
-                    x-html="email.body">
-                </div>
+                    x-html="selectedEmail.body"></div>
 
-                <!-- Attachments -->
-                <template x-if="email.attachments && email.attachments.length > 0">
+                <template x-if="selectedEmail.attachments && selectedEmail.attachments.length > 0">
                     <div class="mt-8 border-t border-gray-100 pt-6">
-                        <h3 class="text-sm font-semibold text-gray-600 mb-3">
-                            Attachments (<span x-text="email.attachments.length"></span>)
-                        </h3>
+                        <h3 class="text-sm font-semibold text-gray-600 mb-3">Attachments (<span
+                                x-text="selectedEmail.attachments.length"></span>)</h3>
                         <div class="flex flex-wrap gap-3">
-                            <template x-for="att in email.attachments" :key="att.filename">
-                                <a :href="`data:${att.mimeType};base64,${att.data_b64}`"
-                                    :download="att.filename"
-                                    class="flex items-center gap-2 px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-700 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700 transition-all cursor-pointer">
-                                    <span x-text="att.mimeType.includes('pdf') ? '📄' : att.mimeType.includes('image') ? '🖼️' : att.mimeType.includes('zip') ? '🗜️' : '📎'"></span>
+                            <template x-for="att in selectedEmail.attachments" :key="att.filename">
+                                <a :href="`data:${att.mimeType};base64,${att.data_b64}`" :download="att.filename"
+                                    class="flex items-center gap-2 px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-700 hover:bg-blue-50 transition-all">
+                                    <span
+                                        x-text="att.mimeType.includes('pdf') ? '📄' : att.mimeType.includes('image') ? '🖼️' : '📎'"></span>
                                     <span x-text="att.filename"></span>
                                 </a>
                             </template>
                         </div>
                     </div>
                 </template>
+            </div>
+        </template>
 
-                <!-- Reply -->
-                <div class="mt-auto pt-10">
-                    <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 text-sm text-gray-400">
-                        Click here to <span class="text-blue-600 font-medium cursor-pointer">Reply</span>...
-                    </div>
-                </div>
-
+        <template x-if="!selectedEmail">
+            <div class="flex-1 flex flex-col items-center justify-center text-gray-400">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-4 opacity-20" fill="none"
+                    viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+                <p>Select an email to read it</p>
             </div>
         </template>
     </main>
 
-    {{ emails|json_script:"emails-data" }}
-
     <script>
-        document.addEventListener('alpine:init', () => {
-            Alpine.data('emailApp', () => ({
-                selectedEmail: 1,
-                emails: JSON.parse(document.getElementById('emails-data').textContent),
-            }))
-        })
-    </script>
+        function emailApp() {
+            return {
+                emails: [],
+                selectedEmail: null,
+                loading: true,
+                socket: null,
+                initWebSocket() {
+                    const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+                    this.socket = new WebSocket(protocol + window.location.host + '/ws/emails/');
 
+                    this.socket.onmessage = (e) => {
+                        const data = JSON.parse(e.data);
+                        this.emails = data.emails;
+                        this.loading = false;
+                        if (!this.selectedEmail && this.emails.length > 0) this.selectedEmail = this.emails[0];
+                    };
+                },
+                refresh() {
+                    this.loading = true;
+                    this.socket.send(JSON.stringify({ 'action': 'refresh' }));
+                }
+            }
+        }
+    </script>
 </body>
 
 </html>
