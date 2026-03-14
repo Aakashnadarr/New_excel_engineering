@@ -33,7 +33,7 @@ def email_fetcher():
 
     try:
         service = build('gmail', 'v1', credentials=creds)
-        results = service.users().messages().list(userId='me',q='label:INBOX category:primary', maxResults=15).execute()
+        results = service.users().messages().list(userId='me',q='label:INBOX', maxResults=10).execute()
         messages = results.get('messages', [])
         msge = []
 
