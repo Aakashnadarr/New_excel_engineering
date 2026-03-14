@@ -9,9 +9,9 @@ class EmailConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         await self.accept()
         self.fetching = True
-        # Initial immediate fetch
+        # Fetch immediately on connection
         asyncio.create_task(self.send_emails()) 
-        # Recurring background task
+        # Start background update loop
         self.loop_task = asyncio.create_task(self.fetch_emails_loop())
 
     async def disconnect(self, close_code):
@@ -20,20 +20,24 @@ class EmailConsumer(AsyncWebsocketConsumer):
             self.loop_task.cancel()
 
     async def receive(self, text_data):
-        data = json.loads(text_data)
-        if data.get('action') == 'refresh':
-            await self.send_emails()
+        try:
+            data = json.loads(text_data)
+            if data.get('action') == 'refresh':
+                await self.send_emails()
+        except json.JSONDecodeError:
+            pass
 
     async def fetch_emails_loop(self):
         while self.fetching:
-            await asyncio.sleep(30)
-            await self.send_emails()
+            await asyncio.sleep(60)  # Extended to 60s for better performance
+            if self.fetching:
+                await self.send_emails()
 
     async def send_emails(self):
         try:
             raw_emails = await asyncio.to_thread(email_fetcher)
             processed_emails = []
-            for i, email in enumerate(raw_emails):
+            for email in raw_emails:
                 attachments = []
                 for att in email.get('attachments', []):
                     attachments.append({
@@ -43,15 +47,15 @@ class EmailConsumer(AsyncWebsocketConsumer):
                     })
 
                 processed_emails.append({
-                    'id': i + 1,
-                    'name': email['sender'].split('<')[0].strip(),
+                    'id': email['id'],
+                    'name': email['sender'].split('<')[0].strip().replace('"', ''),
                     'from': email['sender'],
                     'subject': email['subject'],
                     'time': email['time'],
-                    'body': email.get('body', 'No content'),
+                    'body': email['body'],
                     'attachments': attachments,
                 })
 
             await self.send(text_data=json.dumps({'emails': processed_emails}))
         except Exception as e:
-            print(f"Error: {e}")
+            print(f"WebSocket Error: {e}")
