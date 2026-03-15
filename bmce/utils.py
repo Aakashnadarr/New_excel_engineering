@@ -1,15 +1,19 @@
 # bmce/utils.py
+import os.path
+import base64
+import logging
+import time
+import random
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
-import os.path
-import base64
-import logging
+from googleapiclient.errors import HttpError
 
 logger = logging.getLogger(__name__)
 
-def email_fetcher():
+def build_gmail_service():
+    """Helper function to authenticate and return the Gmail API service."""
     creds = None
     SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
 
@@ -31,32 +35,83 @@ def email_fetcher():
         with open('token.json', 'w') as token:
             token.write(creds.to_json())
 
+    return build('gmail', 'v1', credentials=creds)
+
+def email_fetcher(max_results=500):
+    """Fetches list of emails using batch requests and backoff to avoid 429 errors."""
     try:
-        service = build('gmail', 'v1', credentials=creds)
-        results = service.users().messages().list(userId='me',q='label:INBOX', maxResults=10).execute()
+        service = build_gmail_service()
+        
+        # Primary inbox query with exclusions
+        results = service.users().messages().list(
+            userId='me', 
+            q='label:INBOX category:primary -from:HDFC -from:SBI', 
+            maxResults=max_results
+        ).execute()
+        
         messages = results.get('messages', [])
+        if not messages:
+            return []
+
         msge = []
+        failed_ids = []
 
-        for msg in messages:
-            message = service.users().messages().get(userId='me', id=msg['id'], format='full').execute()
-            headers = {h['name']: h['value'] for h in message.get('payload', {}).get('headers', [])}
+        def callback(request_id, response, exception):
+            if exception is not None:
+                # If rate limited (429), track the ID for retry
+                if isinstance(exception, HttpError) and exception.resp.status == 429:
+                    failed_ids.append(request_id)
+                else:
+                    logger.error(f"Error fetching {request_id}: {exception}")
+            else:
+                headers = {h['name']: h['value'] for h in response.get('payload', {}).get('headers', [])}
+                msge.append({
+                    'id': response['id'],
+                    'internalDate': int(response.get('internalDate', 0)),
+                    'subject': headers.get('Subject', '(No Subject)'),
+                    'sender': headers.get('From', 'Unknown'),
+                    'time': headers.get('Date', ''),
+                    'snippet': response.get('snippet', ''),
+                    'payload': response.get('payload', {})
+                })
+
+        def run_batch(msg_list):
+            batch = service.new_batch_http_request(callback=callback)
+            for m in msg_list:
+                batch.add(service.users().messages().get(userId='me', id=m['id'], format='full'), request_id=m['id'])
+            batch.execute()
+
+        # Process in smaller chunks (50) to avoid overwhelming the API
+        chunk_size = 50
+        for i in range(0, len(messages), chunk_size):
+            current_chunk = messages[i:i + chunk_size]
             
-            body, attachments = parse_parts(service, msg['id'], message.get('payload', {}))
+            retries = 0
+            while retries < 5:
+                run_batch(current_chunk)
+                
+                if not failed_ids:
+                    break
+                
+                # Exponential backoff: 2^retries + random jitter
+                wait_time = (2 ** retries) + random.random()
+                logger.warning(f"Rate limited. Waiting {wait_time:.2f}s before retry...")
+                time.sleep(wait_time)
+                
+                # Setup next retry for failed messages only
+                current_chunk = [{'id': fid} for fid in failed_ids]
+                failed_ids = []
+                retries += 1
 
-            msge.append({
-                'id': msg['id'],
-                'subject': headers.get('Subject', '(No Subject)'),
-                'sender': headers.get('From', 'Unknown'),
-                'time': headers.get('Date', ''),
-                'body': body or "No content available.",
-                'attachments': attachments 
-            })
-        return msge
+        # Final Sort: Newest First
+        return sorted(msge, key=lambda x: x['internalDate'], reverse=True)
+
     except Exception as e:
-        logger.error(f"Error fetching emails: {e}")
+        logger.error(f"Critical error in email_fetcher: {e}")
         return []
 
 def parse_parts(service, msg_id, payload):
+    """Parses email parts to extract body text and attachments."""
     body = ""
     attachments = []
 
@@ -71,7 +126,6 @@ def parse_parts(service, msg_id, payload):
             for p in parts:
                 recurse(p)
         elif not filename:
-            # Prioritize HTML body but keep Plain Text as fallback
             if mime_type == 'text/html':
                 data = part_body.get('data', '')
                 if data:
