@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>New Excel Engineering – Delivery Challan</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500;600&display=swap');
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background:#c8c8c8;
+  font-family:'Barlow',sans-serif;
+  display:flex; flex-direction:column; align-items:center;
+  padding:20px 10px; gap:14px;
+}
+
+.controls {
+  background:#fff; padding:10px 16px;
+  display:flex; gap:10px;
+  box-shadow:0 2px 6px rgba(0,0,0,0.2);
+}
+.controls button {
+  padding:7px 18px; border:none; cursor:pointer;
+  font-size:13px; font-weight:600; font-family:'Barlow',sans-serif;
+}
+.btn-print { background:#1a3160; color:#fff; }
+.btn-clear { background:#eee; color:#333; }
+
+.page {
+  width:210mm;
+  background:#fff;
+  padding:7mm 7mm 6mm;
+  box-shadow:0 4px 24px rgba(0,0,0,0.25);
+}
+
+/* MASTER TABLE */
+.master {
+  width:100%;
+  border-collapse:collapse;
+  border:2px solid #1a3160;
+}
+.master td, .master th {
+  border:1.5px solid #1a3160;
+  padding:0;
+  vertical-align:middle;
+}
+.master tr:first-child td,
+.master tr:first-child th { border-top:none; }
+.master td:first-child,
+.master th:first-child { border-left:none; }
+
+/* LOGO */
+.td-logo { width:70px; text-align:center; padding:5px 4px; }
+.logo-outer {
+  width:58px; height:58px; border-radius:50%;
+  border:2px solid #1a3160;
+  display:inline-flex; align-items:center; justify-content:center;
+}
+.logo-inner {
+  width:46px; height:46px; border-radius:50%;
+  border:1.5px solid #1a3160;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+}
+.logo-nee { font-family:'Barlow Condensed',sans-serif; font-size:21px; font-weight:800; color:#1a3160; line-height:1; }
+.logo-sub { font-size:5px; font-weight:700; color:#1a3160; text-align:center; line-height:1.3; text-transform:uppercase; }
+
+/* COMPANY */
+.td-company { text-align:center; padding:5px 10px; }
+.co-name { font-family:'Barlow Condensed',sans-serif; font-size:27px; font-weight:800; color:#1a3160; line-height:1.05; }
+.co-tag { font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:700; color:#1a3160; margin:2px 0 1px; }
+.co-addr { font-size:9px; color:#1a3160; line-height:1.6; }
+
+/* FIELDS */
+.td-to { padding:6px 8px; vertical-align:top; }
+.td-nums { width:215px; padding:6px 8px; vertical-align:middle; }
+
+.fl { display:flex; align-items:center; gap:3px; font-size:10px; color:#111; margin-bottom:5px; }
+.fl:last-child { margin-bottom:0; }
+.fl span { white-space:nowrap; }
+
+input[type=text] {
+  border:none; border-bottom:1px solid #777;
+  outline:none; font-size:10px; font-family:'Barlow',sans-serif;
+  padding:0 2px; background:transparent; color:#111;
+  border-radius:0; -webkit-border-radius:0;
+}
+input[type=text]:focus { border-bottom-color:#1a3160; }
+
+/* NOTICE */
+.td-notice { text-align:center; font-size:10px; font-style:italic; color:#222; padding:3px 6px; }
+
+/* HEADERS */
+.master th {
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:12px; font-weight:700; color:#1a3160;
+  padding:5px 3px; background:#fff;
+}
+
+/* ITEM ROWS */
+.tr-item td { height:23px; }
+.td-sr-val { text-align:center; font-size:9.5px; color:#333; }
+.tr-item td input[type=text] { width:100%; border:none; padding:1px 4px; font-size:10px; display:block; }
+
+/* GSTIN */
+.tr-gstin td { padding:5px 8px; font-size:10px; font-weight:700; }
+
+/* FOOTER outside table */
+.footer-strip {
+  display:flex; justify-content:space-between;
+  align-items:flex-end; padding:5px 2px 0;
+  font-size:10px; color:#333;
+}
+
+@media print {
+  body { background:#fff; padding:0; }
+  .controls { display:none; }
+  .page { box-shadow:none; padding:7mm; }
+  @page { size:A4; margin:0; }
+}
+</style>
+</head>
+<body>
+
+<div class="controls">
+  <button class="btn-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  <button class="btn-clear" onclick="document.querySelectorAll('input').forEach(i=>i.value='')">🗑️ Clear All</button>
+</div>
+
+<div class="page">
+
+<!-- META -->
+<table style="width:100%;border-collapse:collapse;margin-bottom:1px;">
+  <tr>
+    <td style="border:none;width:120px;"> </td>
+    <td style="border:none;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;color:#1a3160;letter-spacing:3px;">DELIVERY CHALLAN</td>
+    <td style="border:none;text-align:right;font-size:9px;color:#222;line-height:1.6;white-space:nowrap;vertical-align:top;">Asmani Nadar<br>9820966832<br>8108968306</td>
+  </tr>
+</table>
+
+<!-- MASTER TABLE -->
+<table class="master">
+
+  <!-- Logo + Company -->
+  <tr>
+    <td class="td-logo">
+      <div class="logo-outer"><div class="logo-inner">
+        <div class="logo-nee">NEE</div>
+        <div class="logo-sub">NEW EXCEL<br>ENGINEERING</div>
+      </div></div>
+    </td>
+    <td class="td-company" colspan="3">
+      <div class="co-name">NEW EXCEL ENGINEERING</div>
+      <div class="co-tag">Job Works on CNC Milling All Types of Machinery Job Works</div>
+      <div class="co-addr">
+        <strong style="font-size:9px;">Specialists in :</strong> Precision Pharmaceuticals, All Type change parts, Moulding &amp; Cutting Tools,<br>
+        Works : Gala No. 18, Rihal Estate, Opp. SBI Bank, Behind Mansa Hotel, LBS Marg Bhandup (W),<br>
+        Mumbai - 400 078. &nbsp;•&nbsp; Email : newexcelengineering@gmail.com
+      </div>
+    </td>
+  </tr>
+
+  <!-- To / Challan fields -->
+  <tr>
+    <td class="td-to" colspan="2">
+      <div class="fl" style="font-weight:700;">To,</div>
+      <div class="fl"><span>M/s.</span><input type="text" style="flex:1;" placeholder="Party Name"></div>
+      <div class="fl"><input type="text" style="flex:1;" placeholder="Address / City"></div>
+    </td>
+    <td class="td-nums" colspan="2">
+      <div class="fl"><span>Challan No.</span><input type="text" style="width:55px;"><span style="margin-left:4px;">Date</span><input type="text" style="width:52px;"></div>
+      <div class="fl"><span>P. Order No.</span><input type="text" style="width:48px;"><span style="margin-left:4px;">Date</span><input type="text" style="width:52px;"></div>
+    </td>
+  </tr>
+
+  <!-- Notice -->
+  <tr>
+    <td class="td-notice" colspan="4">Please receive the following goods in good order and condition</td>
+  </tr>
+
+  <!-- Column headers -->
+  <tr>
+    <th style="width:28px; text-align:center;">Sr.<br>No.</th>
+    <th style="text-align:center;">PARTICULARS</th>
+    <th style="width:65px; text-align:center;">Qty.</th>
+    <th style="width:72px; text-align:center;">Rate</th>
+  </tr>
+
+  <!-- 16 item rows -->
+  <tr class="tr-item"><td class="td-sr-val">1</td><td><input type="text" style="width:100%;"></td><td><input type="text" style="width:100%;text-align:right;padding-right:4px;"></td><td><input type="text" style="width:100%;text-align:right;padding-right:4px;"></td></tr>
+  <tr class="tr-item"><td class="td-sr-val">2</td><td><input type="text" style="width:100%;"></td><td><input type="text" style="width:100%;text-align:right;padding-right:4px;"></td><td><input type="text" style="width:100%;text-align:right;padding-right:4px;"></td></tr>
+  <tr class="tr-item"><td class="td-sr-val">3</td><td><input type="text" style="width:100%;"></td><td><input type="text" style="width:100%;text-align:right;padding-right:4px;"></td><td><input type="text" style="width:100%;text-align:right;padding-right:4px;"></td></tr>
+  <tr class="tr-item"><td class="td-sr-val">4</td><td><input type="text" style="width:100%;"></td><td><input type="text" style="width:100%;text-align:right;padding-right:4px;"></td><td><input type="text" style="width:100%;text-align:right;padding-right:4px;"></td></tr>
+  <tr class="tr-item"><td class="td-sr-val">5</td><td><input type="text" style="width:100%;"></td><td><input type="text" style="width:100%;text-align:right;padding-right:4px;"></td><td><input type="text" style="width:100%;text-align:right;padding-right:4px;"></td></tr>
+  <tr class="tr-item"><td class="td-sr-val">6</td><td><input type="text" style="width:100%;"></td><td><input type="text" style="width:100%;text-align:right;padding-right:4px;"></td><td><input type="text" style="width:100%;text-align:right;padding-right:4px;"></td></tr>
+  <tr class="tr-item"><td class="td-sr-val">7</td><td><input type="text" style="width:100%;"></td><td><input type="text" style="width:100%;text-align:right;padding-right:4px;"></td><td><input type="text" style="width:100%;text-align:right;padding-right:4px;"></td></tr>
+  <tr class="tr-item"><td class="td-sr-val">8</td><td><input type="text" style="width:100%;"></td><td><input type="text" style="width:100%;text-align:right;padding-right:4px;"></td><td><input type="text" style="width:100%;text-align:right;padding-right:4px;"></td></tr>
+  <tr class="tr-item"><td class="td-sr-val">9</td><td><input type="text" style="width:100%;"></td><td><input type="text" style="width:100%;text-align:right;padding-right:4px;"></td><td><input type="text" style="width:100%;text-align:right;padding-right:4px;"></td></tr>
+  <tr class="tr-item"><td class="td-sr-val">10</td><td><input type="text" style="width:100%;"></td><td><input type="text" style="width:100%;text-align:right;padding-right:4px;"></td><td><input type="text" style="width:100%;text-align:right;padding-right:4px;"></td></tr>
+  <tr class="tr-item"><td class="td-sr-val">11</td><td><input type="text" style="width:100%;"></td><td><input type="text" style="width:100%;text-align:right;padding-right:4px;"></td><td><input type="text" style="width:100%;text-align:right;padding-right:4px;"></td></tr>
+  <tr class="tr-item"><td class="td-sr-val">12</td><td><input type="text" style="width:100%;"></td><td><input type="text" style="width:100%;text-align:right;padding-right:4px;"></td><td><input type="text" style="width:100%;text-align:right;padding-right:4px;"></td></tr>
+  <tr class="tr-item"><td class="td-sr-val">13</td><td><input type="text" style="width:100%;"></td><td><input type="text" style="width:100%;text-align:right;padding-right:4px;"></td><td><input type="text" style="width:100%;text-align:right;padding-right:4px;"></td></tr>
+  <tr class="tr-item"><td class="td-sr-val">14</td><td><input type="text" style="width:100%;"></td><td><input type="text" style="width:100%;text-align:right;padding-right:4px;"></td><td><input type="text" style="width:100%;text-align:right;padding-right:4px;"></td></tr>
+  <tr class="tr-item"><td class="td-sr-val">15</td><td><input type="text" style="width:100%;"></td><td><input type="text" style="width:100%;text-align:right;padding-right:4px;"></td><td><input type="text" style="width:100%;text-align:right;padding-right:4px;"></td></tr>
+  <tr class="tr-item"><td class="td-sr-val">16</td><td><input type="text" style="width:100%;"></td><td><input type="text" style="width:100%;text-align:right;padding-right:4px;"></td><td><input type="text" style="width:100%;text-align:right;padding-right:4px;"></td></tr>
+
+  <!-- GSTIN row -->
+  <tr class="tr-gstin">
+    <td colspan="2" style="text-align:left;">GSTIN No.: 27AAHFN9441P1ZI</td>
+    <td colspan="2" style="text-align:right; padding:5px 8px; font-size:10px;">For <strong>NEW EXCEL ENGINEERING</strong></td>
+  </tr>
+
+</table><!-- /master -->
+
+<!-- FOOTER STRIP (outside table, no border needed) -->
+<div class="footer-strip">
+  <div>Receiver's Signature &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;________________________________</div>
+  <div>Partner</div>
+</div>
+
+</div><!-- /page -->
+</body>
+</html>
