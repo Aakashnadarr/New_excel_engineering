@@ -1,315 +1,650 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<title>New Excel Engineering – Tax Invoice</title>
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500;600&display=swap');
+  <meta charset="UTF-8">
+  <title>New Excel Engineering – Tax Invoice</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500;600&display=swap');
 
-* { margin:0; padding:0; box-sizing:border-box; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-body {
-  background:#c8c8c8;
-  font-family:'Barlow',sans-serif;
-  display:flex; flex-direction:column; align-items:center;
-  padding:20px 10px; gap:14px;
-}
+    body {
+      background: #c8c8c8;
+      font-family: 'Barlow', sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px 10px;
+      gap: 14px;
+    }
 
-.controls {
-  background:#fff; padding:10px 16px;
-  display:flex; gap:10px;
-  box-shadow:0 2px 6px rgba(0,0,0,0.2);
-}
-.controls button {
-  padding:7px 18px; border:none; cursor:pointer;
-  font-size:13px; font-weight:600; font-family:'Barlow',sans-serif;
-}
-.btn-print { background:#1a3160; color:#fff; }
-.btn-clear { background:#eee; color:#333; }
+    .controls {
+      background: #fff;
+      padding: 10px 16px;
+      display: flex;
+      gap: 10px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
 
-/* PAGE */
-.page {
-  width:210mm;
-  background:#fff;
-  padding:7mm 7mm 6mm;
-  box-shadow:0 4px 24px rgba(0,0,0,0.25);
-}
+    .controls button {
+      padding: 7px 18px;
+      border: none;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: 'Barlow', sans-serif;
+    }
 
-/* KEY: single master table drives everything */
-.master {
-  width:100%;
-  border-collapse:collapse;
-  border:2px solid #1a3160;
-}
+    .btn-print {
+      background: #1a3160;
+      color: #fff;
+    }
 
-.master td, .master th {
-  border:1.5px solid #1a3160;
-  padding:0;
-  vertical-align:middle;
-}
+    .btn-clear {
+      background: #eee;
+      color: #333;
+    }
 
-/* Remove double-borders at edges */
-.master tr:first-child td,
-.master tr:first-child th { border-top:none; }
-.master td:first-child,
-.master th:first-child { border-left:none; }
+    /* PAGE */
+    .page {
+      width: 210mm;
+      background: #fff;
+      padding: 7mm 7mm 6mm;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
+    }
 
-/* ── LOGO ── */
-.td-logo {
-  width:70px; text-align:center; padding:5px 4px;
-}
-.logo-outer {
-  width:58px; height:58px; border-radius:50%;
-  border:2px solid #1a3160;
-  display:inline-flex; align-items:center; justify-content:center;
-}
-.logo-inner {
-  width:46px; height:46px; border-radius:50%;
-  border:1.5px solid #1a3160;
-  display:flex; flex-direction:column;
-  align-items:center; justify-content:center;
-}
-.logo-nee {
-  font-family:'Barlow Condensed',sans-serif;
-  font-size:21px; font-weight:800; color:#1a3160; line-height:1;
-}
-.logo-sub {
-  font-size:5px; font-weight:700; color:#1a3160;
-  text-align:center; line-height:1.3; text-transform:uppercase;
-}
+    /* KEY: single master table drives everything */
+    .master {
+      width: 100%;
+      border-collapse: collapse;
+      border: 2px solid #1a3160;
+    }
 
-/* ── COMPANY DETAILS ── */
-.td-company { text-align:center; padding:5px 10px; }
-.co-name {
-  font-family:'Barlow Condensed',sans-serif;
-  font-size:27px; font-weight:800; color:#1a3160; line-height:1.05;
-}
-.co-tag {
-  font-family:'Barlow Condensed',sans-serif;
-  font-size:11px; font-weight:700; color:#1a3160; margin:2px 0 1px;
-}
-.co-addr { font-size:9px; color:#1a3160; line-height:1.6; }
+    .master td,
+    .master th {
+      border: 1.5px solid #1a3160;
+      padding: 0;
+      vertical-align: middle;
+    }
 
-/* ── ADDRESS / BILL FIELDS ── */
-.td-to { padding:5px 8px; vertical-align:top; }
-.td-billnums { width:215px; padding:5px 8px; vertical-align:middle; }
+    /* Remove double-borders at edges */
+    .master tr:first-child td,
+    .master tr:first-child th {
+      border-top: none;
+    }
 
-.fl { display:flex; align-items:center; gap:3px; font-size:10px; color:#111; margin-bottom:4px; }
-.fl:last-child { margin-bottom:0; }
-.fl span { white-space:nowrap; }
+    .master td:first-child,
+    .master th:first-child {
+      border-left: none;
+    }
 
-input[type=text] {
-  border:none; border-bottom:1px solid #777;
-  outline:none; font-size:10px; font-family:'Barlow',sans-serif;
-  padding:0 2px; background:transparent; color:#111; border-radius:0;
-  -webkit-border-radius:0;
-}
-input[type=text]:focus { border-bottom-color:#1a3160; }
+    /* ── LOGO ── */
+    .td-logo {
+      width: 70px;
+      text-align: center;
+      padding: 5px 4px;
+    }
 
-/* ── NOTICE ── */
-.td-notice {
-  text-align:center; font-size:10px; font-style:italic;
-  color:#222; padding:3px 6px;
-}
+    .logo-outer {
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
 
-/* ── COLUMN HEADERS ── */
-.th-sr { width:28px; text-align:center; }
-.th-part { text-align:center; }
-.th-qty { width:52px; text-align:center; }
-.th-rate { width:55px; text-align:center; }
-.th-rs { width:54px; text-align:center; }
-.th-p  { width:26px; text-align:center; }
+    .logo-inner {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
 
-.master th {
-  font-family:'Barlow Condensed',sans-serif;
-  font-size:12px; font-weight:700; color:#1a3160;
-  padding:4px 3px; background:#fff;
-}
+    .logo-nee {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 21px;
+      font-weight: 800;
+      color: #1a3160;
+      line-height: 1;
+    }
 
-/* ── ITEM ROWS ── */
-.tr-item td { height:21px; }
-.td-sr-val { text-align:center; font-size:9.5px; color:#333; }
-.td-sr-val, .td-input { padding:0; }
+    .logo-sub {
+      font-size: 5px;
+      font-weight: 700;
+      color: #1a3160;
+      text-align: center;
+      line-height: 1.3;
+      text-transform: uppercase;
+    }
 
-.tr-item td input[type=text] {
-  width:100%; border:none; border-bottom:none;
-  padding:1px 4px; font-size:10px; height:100%;
-  display:block;
-}
+    /* ── COMPANY DETAILS ── */
+    .td-company {
+      text-align: center;
+      padding: 5px 10px;
+    }
 
-/* ── GSTIN ROW ── */
-.tr-gstin td { padding:4px 8px; font-size:10px; font-weight:700; }
+    .co-name {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 27px;
+      font-weight: 800;
+      color: #1a3160;
+      line-height: 1.05;
+    }
 
-/* ── TOTALS ── */
-.td-terms { font-size:9px; color:#333; line-height:1.6; padding:2px 8px; vertical-align:top; }
-.td-lbl {
-  font-family:'Barlow Condensed',sans-serif;
-  font-size:11px; font-weight:700; text-align:center;
-  white-space:nowrap; padding:3px 5px;
-}
-.td-val { width:54px; padding:2px 4px; }
-.td-val input[type=text], .td-p input[type=text] { width:100%; text-align:right; }
-.td-p { width:26px; padding:2px 3px; }
-.td-grand {
-  font-family:'Barlow Condensed',sans-serif;
-  font-size:12px; font-weight:800; text-align:center;
-  color:#1a3160; background:#eef1fa; padding:4px 5px;
-}
+    .co-tag {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      color: #1a3160;
+      margin: 2px 0 1px;
+    }
 
-/* ── BOTTOM ── */
-.td-juris { font-size:8.5px; line-height:1.6; color:#333; padding:4px 6px; vertical-align:top; }
-.td-juris strong { display:block; font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:700; color:#1a3160; margin-bottom:2px; }
-.td-eoe { text-align:center; font-size:10px; font-weight:600; color:#444; width:60px; vertical-align:bottom; padding-bottom:4px; }
-.td-forsig { text-align:right; width:155px; vertical-align:top; padding:4px 0 4px 4px; }
-.for-nee { font-family:'Barlow Condensed',sans-serif; font-size:12px; font-weight:700; color:#1a3160; margin-bottom:32px; }
-.partner { font-size:10px; color:#333; border-top:1px solid #666; padding-top:2px; display:inline-block; min-width:80px; text-align:center; }
+    .co-addr {
+      font-size: 9px;
+      color: #1a3160;
+      line-height: 1.6;
+    }
 
-@media print {
-  body { background:#fff; padding:0; }
-  .controls { display:none; }
-  .page { box-shadow:none; padding:7mm; }
-  @page { size:A4; margin:0; }
-}
-</style>
+    /* ── ADDRESS / BILL FIELDS ── */
+    .td-to {
+      padding: 5px 8px;
+      vertical-align: top;
+    }
+
+    .td-billnums {
+      width: 215px;
+      padding: 5px 8px;
+      vertical-align: middle;
+    }
+
+    .fl {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      font-size: 10px;
+      color: #111;
+      margin-bottom: 4px;
+    }
+
+    .fl:last-child {
+      margin-bottom: 0;
+    }
+
+    .fl span {
+      white-space: nowrap;
+    }
+
+    input[type=text] {
+      border: none;
+      border-bottom: 1px solid #777;
+      outline: none;
+      font-size: 10px;
+      font-family: 'Barlow', sans-serif;
+      padding: 0 2px;
+      background: transparent;
+      color: #111;
+      border-radius: 0;
+      -webkit-border-radius: 0;
+    }
+
+    input[type=text]:focus {
+      border-bottom-color: #1a3160;
+    }
+
+    /* ── NOTICE ── */
+    .td-notice {
+      text-align: center;
+      font-size: 10px;
+      font-style: italic;
+      color: #222;
+      padding: 3px 6px;
+    }
+
+    /* ── COLUMN HEADERS ── */
+    .th-sr {
+      width: 28px;
+      text-align: center;
+    }
+
+    .th-part {
+      text-align: center;
+    }
+
+    .th-qty {
+      width: 52px;
+      text-align: center;
+    }
+
+    .th-rate {
+      width: 55px;
+      text-align: center;
+    }
+
+    .th-rs {
+      width: 54px;
+      text-align: center;
+    }
+
+    .th-p {
+      width: 26px;
+      text-align: center;
+    }
+
+    .master th {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      color: #1a3160;
+      padding: 4px 3px;
+      background: #fff;
+    }
+
+    /* ── ITEM ROWS ── */
+    .tr-item td {
+      height: 21px;
+    }
+
+    .td-sr-val {
+      text-align: center;
+      font-size: 9.5px;
+      color: #333;
+    }
+
+    .td-sr-val,
+    .td-input {
+      padding: 0;
+    }
+
+    .tr-item td input[type=text] {
+      width: 100%;
+      border: none;
+      border-bottom: none;
+      padding: 1px 4px;
+      font-size: 10px;
+      height: 100%;
+      display: block;
+    }
+
+    /* ── GSTIN ROW ── */
+    .tr-gstin td {
+      padding: 4px 8px;
+      font-size: 10px;
+      font-weight: 700;
+    }
+
+    /* ── TOTALS ── */
+    .td-terms {
+      font-size: 9px;
+      color: #333;
+      line-height: 1.6;
+      padding: 2px 8px;
+      vertical-align: top;
+    }
+
+    .td-lbl {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      text-align: center;
+      white-space: nowrap;
+      padding: 3px 5px;
+    }
+
+    .td-val {
+      width: 54px;
+      padding: 2px 4px;
+    }
+
+    .td-val input[type=text],
+    .td-p input[type=text] {
+      width: 100%;
+      text-align: right;
+    }
+
+    .td-p {
+      width: 26px;
+      padding: 2px 3px;
+    }
+
+    .td-grand {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 12px;
+      font-weight: 800;
+      text-align: center;
+      color: #1a3160;
+      background: #eef1fa;
+      padding: 4px 5px;
+    }
+
+    /* ── BOTTOM ── */
+    .td-juris {
+      font-size: 8.5px;
+      line-height: 1.6;
+      color: #333;
+      padding: 4px 6px;
+      vertical-align: top;
+    }
+
+    .td-juris strong {
+      display: block;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      color: #1a3160;
+      margin-bottom: 2px;
+    }
+
+    .td-eoe {
+      text-align: center;
+      font-size: 10px;
+      font-weight: 600;
+      color: #444;
+      width: 60px;
+      vertical-align: bottom;
+      padding-bottom: 4px;
+    }
+
+    .td-forsig {
+      text-align: right;
+      width: 155px;
+      vertical-align: top;
+      padding: 4px 0 4px 4px;
+    }
+
+    .for-nee {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      color: #1a3160;
+      margin-bottom: 32px;
+    }
+
+    .partner {
+      font-size: 10px;
+      color: #333;
+      border-top: 1px solid #666;
+      padding-top: 2px;
+      display: inline-block;
+      min-width: 80px;
+      text-align: center;
+    }
+
+    @media print {
+      body {
+        background: #fff;
+        padding: 0;
+      }
+
+      .controls {
+        display: none;
+      }
+
+      .page {
+        box-shadow: none;
+        padding: 7mm;
+      }
+
+      @page {
+        size: A4;
+        margin: 0;
+      }
+    }
+  </style>
 </head>
+
 <body>
 
-<div class="controls">
-  <button class="btn-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
-  <button class="btn-clear" onclick="document.querySelectorAll('input').forEach(i=>i.value='')">🗑️ Clear All</button>
-</div>
+  <div class="controls">
+    <button class="btn-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+    <button class="btn-clear" onclick="document.querySelectorAll('input').forEach(i=>i.value='')">🗑️ Clear All</button>
+  </div>
 
-<div class="page">
+  <div class="page">
 
-<!-- META (outside master table, no border) -->
-<table style="width:100%;border-collapse:collapse;margin-bottom:1px;">
-  <tr>
-    <td style="width:130px; border:none;"> </td>
-    <td style="border:none; text-align:center; font-family:'Barlow Condensed',sans-serif; font-size:16px; font-weight:700; color:#1a3160; letter-spacing:3px;">TAX INVOICE</td>
-    <td style="border:none; text-align:right; font-size:9px; color:#222; line-height:1.6; white-space:nowrap; vertical-align:top;">Mani - 8108968306 / 9820966832</td>
-  </tr>
-</table>
+    <!-- META (outside master table, no border) -->
+    <table style="width:100%;border-collapse:collapse;margin-bottom:1px;">
+      <tr>
+        <td style="width:130px; border:none;"> </td>
+        <td
+          style="border:none; text-align:center; font-family:'Barlow Condensed',sans-serif; font-size:16px; font-weight:700; color:#1a3160; letter-spacing:3px;">
+          TAX INVOICE</td>
+        <td
+          style="border:none; text-align:right; font-size:9px; color:#222; line-height:1.6; white-space:nowrap; vertical-align:top;">
+          Mani - 8108968306 / 9820966832</td>
+      </tr>
+    </table>
 
-<!-- MASTER TABLE: everything inside one collapsed-border table -->
-<table class="master">
+    <!-- MASTER TABLE: everything inside one collapsed-border table -->
+    <table class="master">
 
-  <!-- ROW 1: Logo + Company Name -->
-  <tr>
-    <td class="td-logo" rowspan="1">
-      <div class="logo-outer"><div class="logo-inner">
-        <div class="logo-nee">NEE</div>
-        <div class="logo-sub">NEW EXCEL<br>ENGINEERING</div>
-      </div></div>
-    </td>
-    <td class="td-company" colspan="5">
-      <div class="co-name">NEW EXCEL ENGINEERING</div>
-      <div class="co-tag">Job Works on CNC Milling All Types of Machinery Job Works</div>
-      <div class="co-addr">
-        <strong style="font-size:9px;">Specialists in :</strong> Precision Pharmaceuticals, All Type change parts, Moulding &amp; Cutting Tools,<br>
-        Works : Gala No. 18, Rihal Estate, Opp. SBI Bank, Behind Mansa Hotel, LBS Marg Bhandup (W),<br>
-        Mumbai - 400 078. &nbsp;☎ 022 25660955 &nbsp;•&nbsp; Email : newexcelengineering@gmail.com
-      </div>
-    </td>
-  </tr>
+      <!-- ROW 1: Logo + Company Name -->
+      <tr>
+        <td class="td-logo" rowspan="1">
+          <div class="logo-outer">
+            <div class="logo-inner">
+              <img src="{% static 'logo/nee_logo.png' %}" style="width: auto; height: auto;"
+                alt="NEW EXCEL ENGINEERING Logo" class="logo">
+            </div>
+          </div>
+        </td>
+        <td class="td-company" colspan="5">
+          <div class="co-name">NEW EXCEL ENGINEERING</div>
+          <div class="co-tag">Job Works on CNC Milling All Types of Machinery Job Works</div>
+          <div class="co-addr">
+            <strong style="font-size:9px;">Specialists in :</strong> Precision Pharmaceuticals, All Type change parts,
+            Moulding &amp; Cutting Tools,<br>
+            Works : Gala No. 18, Rihal Estate, Opp. SBI Bank, Behind Mansa Hotel, LBS Marg Bhandup (W),<br>
+            Mumbai - 400 078. &nbsp;☎ 022 25660955 &nbsp;•&nbsp; Email : newexcelengineering@gmail.com
+          </div>
+        </td>
+      </tr>
 
-  <!-- ROW 2: To / Bill fields -->
-  <tr>
-    <td class="td-to" colspan="4">
-      <div class="fl" style="font-weight:700;">To,</div>
-      <div class="fl"><span>M/s.</span><input type="text" style="flex:1;" placeholder="Party Name"></div>
-      <div class="fl"><input type="text" style="flex:1;" placeholder="Address"></div>
-      <div class="fl"><input type="text" style="flex:1;" placeholder="City / GSTIN"></div>
-    </td>
-    <td class="td-billnums" colspan="2">
-      <div class="fl"><span>Bill No.</span><input type="text" style="width:52px;"><span style="margin-left:3px;">Date</span><input type="text" style="width:50px;"></div>
-      <div class="fl"><span>Challan No.</span><input type="text" style="width:40px;"><span style="margin-left:3px;">Date</span><input type="text" style="width:50px;"></div>
-      <div class="fl"><span>P. Order No.</span><input type="text" style="width:36px;"><span style="margin-left:3px;">Date</span><input type="text" style="width:50px;"></div>
-    </td>
-  </tr>
+      <!-- ROW 2: To / Bill fields -->
+      <tr>
+        <td class="td-to" colspan="4">
+          <div class="fl" style="font-weight:700;">To,</div>
+          <div class="fl"><span>M/s.</span><input type="text" style="flex:1;" placeholder="Party Name"></div>
+          <div class="fl"><input type="text" style="flex:1;" placeholder="Address"></div>
+          <div class="fl"><input type="text" style="flex:1;" placeholder="City / GSTIN"></div>
+        </td>
+        <td class="td-billnums" colspan="2">
+          <div class="fl"><span>Bill No.</span><input type="text" style="width:52px;"><span
+              style="margin-left:3px;">Date</span><input type="text" style="width:50px;"></div>
+          <div class="fl"><span>Challan No.</span><input type="text" style="width:40px;"><span
+              style="margin-left:3px;">Date</span><input type="text" style="width:50px;"></div>
+          <div class="fl"><span>P. Order No.</span><input type="text" style="width:36px;"><span
+              style="margin-left:3px;">Date</span><input type="text" style="width:50px;"></div>
+        </td>
+      </tr>
 
-  <!-- ROW 3: Notice -->
-  <tr>
-    <td class="td-notice" colspan="6">
-      Please receive the following goods in good order and condition
-    </td>
-  </tr>
+      <!-- ROW 3: Notice -->
+      <tr>
+        <td class="td-notice" colspan="6">
+          Please receive the following goods in good order and condition
+        </td>
+      </tr>
 
-  <!-- ROW 4: Column headers -->
-  <tr>
-    <th class="th-sr">Sr.<br>No.</th>
-    <th class="th-part">PARTICULARS</th>
-    <th class="th-qty">Qty.</th>
-    <th class="th-rate">Rate</th>
-    <th class="th-rs" colspan="2">Amount<br><span style="font-size:10px;font-weight:600;letter-spacing:0;">Rs.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;P.</span></th>
-  </tr>
+      <!-- ROW 4: Column headers -->
+      <tr>
+        <th class="th-sr">Sr.<br>No.</th>
+        <th class="th-part">PARTICULARS</th>
+        <th class="th-qty">Qty.</th>
+        <th class="th-rate">Rate</th>
+        <th class="th-rs" colspan="2">Amount<br><span
+            style="font-size:10px;font-weight:600;letter-spacing:0;">Rs.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;P.</span></th>
+      </tr>
 
-  <!-- ITEM ROWS -->
-  <tr class="tr-item"><td class="td-sr-val">1</td><td class="td-input"><input type="text" style="width:100%;"></td><td class="td-input"><input type="text" style="width:100%;text-align:right;"></td><td class="td-input"><input type="text" style="width:100%;text-align:right;"></td><td class="td-input"><input type="text" style="width:100%;text-align:right;"></td><td class="td-input"><input type="text" style="width:100%;text-align:right;"></td></tr>
-  <tr class="tr-item"><td class="td-sr-val">2</td><td class="td-input"><input type="text" style="width:100%;"></td><td class="td-input"><input type="text" style="width:100%;text-align:right;"></td><td class="td-input"><input type="text" style="width:100%;text-align:right;"></td><td class="td-input"><input type="text" style="width:100%;text-align:right;"></td><td class="td-input"><input type="text" style="width:100%;text-align:right;"></td></tr>
-  <tr class="tr-item"><td class="td-sr-val">3</td><td class="td-input"><input type="text" style="width:100%;"></td><td class="td-input"><input type="text" style="width:100%;text-align:right;"></td><td class="td-input"><input type="text" style="width:100%;text-align:right;"></td><td class="td-input"><input type="text" style="width:100%;text-align:right;"></td><td class="td-input"><input type="text" style="width:100%;text-align:right;"></td></tr>
-  <tr class="tr-item"><td class="td-sr-val">4</td><td class="td-input"><input type="text" style="width:100%;"></td><td class="td-input"><input type="text" style="width:100%;text-align:right;"></td><td class="td-input"><input type="text" style="width:100%;text-align:right;"></td><td class="td-input"><input type="text" style="width:100%;text-align:right;"></td><td class="td-input"><input type="text" style="width:100%;text-align:right;"></td></tr>
-  <tr class="tr-item"><td class="td-sr-val">5</td><td class="td-input"><input type="text" style="width:100%;"></td><td class="td-input"><input type="text" style="width:100%;text-align:right;"></td><td class="td-input"><input type="text" style="width:100%;text-align:right;"></td><td class="td-input"><input type="text" style="width:100%;text-align:right;"></td><td class="td-input"><input type="text" style="width:100%;text-align:right;"></td></tr>
-  <tr class="tr-item"><td class="td-sr-val">6</td><td class="td-input"><input type="text" style="width:100%;"></td><td class="td-input"><input type="text" style="width:100%;text-align:right;"></td><td class="td-input"><input type="text" style="width:100%;text-align:right;"></td><td class="td-input"><input type="text" style="width:100%;text-align:right;"></td><td class="td-input"><input type="text" style="width:100%;text-align:right;"></td></tr>
-  <tr class="tr-item"><td class="td-sr-val">7</td><td class="td-input"><input type="text" style="width:100%;"></td><td class="td-input"><input type="text" style="width:100%;text-align:right;"></td><td class="td-input"><input type="text" style="width:100%;text-align:right;"></td><td class="td-input"><input type="text" style="width:100%;text-align:right;"></td><td class="td-input"><input type="text" style="width:100%;text-align:right;"></td></tr>
-  <tr class="tr-item"><td class="td-sr-val">8</td><td class="td-input"><input type="text" style="width:100%;"></td><td class="td-input"><input type="text" style="width:100%;text-align:right;"></td><td class="td-input"><input type="text" style="width:100%;text-align:right;"></td><td class="td-input"><input type="text" style="width:100%;text-align:right;"></td><td class="td-input"><input type="text" style="width:100%;text-align:right;"></td></tr>
-  <tr class="tr-item"><td class="td-sr-val">9</td><td class="td-input"><input type="text" style="width:100%;"></td><td class="td-input"><input type="text" style="width:100%;text-align:right;"></td><td class="td-input"><input type="text" style="width:100%;text-align:right;"></td><td class="td-input"><input type="text" style="width:100%;text-align:right;"></td><td class="td-input"><input type="text" style="width:100%;text-align:right;"></td></tr>
-  <tr class="tr-item"><td class="td-sr-val">10</td><td class="td-input"><input type="text" style="width:100%;"></td><td class="td-input"><input type="text" style="width:100%;text-align:right;"></td><td class="td-input"><input type="text" style="width:100%;text-align:right;"></td><td class="td-input"><input type="text" style="width:100%;text-align:right;"></td><td class="td-input"><input type="text" style="width:100%;text-align:right;"></td></tr>
-  <tr class="tr-item"><td class="td-sr-val">11</td><td class="td-input"><input type="text" style="width:100%;"></td><td class="td-input"><input type="text" style="width:100%;text-align:right;"></td><td class="td-input"><input type="text" style="width:100%;text-align:right;"></td><td class="td-input"><input type="text" style="width:100%;text-align:right;"></td><td class="td-input"><input type="text" style="width:100%;text-align:right;"></td></tr>
-  <tr class="tr-item"><td class="td-sr-val">12</td><td class="td-input"><input type="text" style="width:100%;"></td><td class="td-input"><input type="text" style="width:100%;text-align:right;"></td><td class="td-input"><input type="text" style="width:100%;text-align:right;"></td><td class="td-input"><input type="text" style="width:100%;text-align:right;"></td><td class="td-input"><input type="text" style="width:100%;text-align:right;"></td></tr>
+      <!-- ITEM ROWS -->
+      <tr class="tr-item">
+        <td class="td-sr-val">1</td>
+        <td class="td-input"><input type="text" style="width:100%;"></td>
+        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
+        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
+        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
+        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
+      </tr>
+      <tr class="tr-item">
+        <td class="td-sr-val">2</td>
+        <td class="td-input"><input type="text" style="width:100%;"></td>
+        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
+        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
+        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
+        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
+      </tr>
+      <tr class="tr-item">
+        <td class="td-sr-val">3</td>
+        <td class="td-input"><input type="text" style="width:100%;"></td>
+        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
+        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
+        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
+        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
+      </tr>
+      <tr class="tr-item">
+        <td class="td-sr-val">4</td>
+        <td class="td-input"><input type="text" style="width:100%;"></td>
+        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
+        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
+        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
+        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
+      </tr>
+      <tr class="tr-item">
+        <td class="td-sr-val">5</td>
+        <td class="td-input"><input type="text" style="width:100%;"></td>
+        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
+        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
+        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
+        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
+      </tr>
+      <tr class="tr-item">
+        <td class="td-sr-val">6</td>
+        <td class="td-input"><input type="text" style="width:100%;"></td>
+        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
+        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
+        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
+        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
+      </tr>
+      <tr class="tr-item">
+        <td class="td-sr-val">7</td>
+        <td class="td-input"><input type="text" style="width:100%;"></td>
+        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
+        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
+        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
+        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
+      </tr>
+      <tr class="tr-item">
+        <td class="td-sr-val">8</td>
+        <td class="td-input"><input type="text" style="width:100%;"></td>
+        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
+        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
+        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
+        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
+      </tr>
+      <tr class="tr-item">
+        <td class="td-sr-val">9</td>
+        <td class="td-input"><input type="text" style="width:100%;"></td>
+        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
+        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
+        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
+        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
+      </tr>
+      <tr class="tr-item">
+        <td class="td-sr-val">10</td>
+        <td class="td-input"><input type="text" style="width:100%;"></td>
+        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
+        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
+        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
+        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
+      </tr>
+      <tr class="tr-item">
+        <td class="td-sr-val">11</td>
+        <td class="td-input"><input type="text" style="width:100%;"></td>
+        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
+        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
+        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
+        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
+      </tr>
+      <tr class="tr-item">
+        <td class="td-sr-val">12</td>
+        <td class="td-input"><input type="text" style="width:100%;"></td>
+        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
+        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
+        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
+        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
+      </tr>
 
-  <!-- GSTIN -->
-  <tr class="tr-gstin">
-    <td colspan="3" style="text-align:left;">GSTIN No.: 27AAHFN9441P1ZI</td>
-    <td colspan="3" style="text-align:right; padding:4px 8px; font-size:10px;">For <strong>NEW EXCEL ENGINEERING</strong></td>
-  </tr>
+      <!-- GSTIN -->
+      <tr class="tr-gstin">
+        <td colspan="3" style="text-align:left;">GSTIN No.: 27AAHFN9441P1ZI</td>
+        <td colspan="3" style="text-align:right; padding:4px 8px; font-size:10px;">For <strong>NEW EXCEL
+            ENGINEERING</strong></td>
+      </tr>
 
-  <!-- TOTALS -->
-  <tr>
-    <td class="td-terms" colspan="3">Rupees: <input type="text" style="width:calc(100% - 50px);" placeholder="Amount in words"></td>
-    <td class="td-lbl">TOTAL</td>
-    <td class="td-val"><input type="text" style="width:100%;text-align:right;"></td>
-    <td class="td-p"><input type="text" style="width:100%;text-align:right;"></td>
-  </tr>
-  <tr>
-    <td class="td-terms" colspan="3">1) Interest at 24% will be charged on bills if not paid on time</td>
-    <td class="td-lbl">C.G.S.T <input type="text" style="width:20px;text-align:center;"> %</td>
-    <td class="td-val"><input type="text" style="width:100%;text-align:right;"></td>
-    <td class="td-p"><input type="text" style="width:100%;text-align:right;"></td>
-  </tr>
-  <tr>
-    <td class="td-terms" colspan="3">2) We reserve the right to demand payment of this bill at any time</td>
-    <td class="td-lbl">S.G.S.T <input type="text" style="width:20px;text-align:center;"> %</td>
-    <td class="td-val"><input type="text" style="width:100%;text-align:right;"></td>
-    <td class="td-p"><input type="text" style="width:100%;text-align:right;"></td>
-  </tr>
-  <tr>
-    <td class="td-terms" colspan="3">3) Our responsibility ceases immediately the goods leave our premises</td>
-    <td class="td-lbl">Round off</td>
-    <td class="td-val"><input type="text" style="width:100%;text-align:right;"></td>
-    <td class="td-p"><input type="text" style="width:100%;text-align:right;"></td>
-  </tr>
-  <tr>
-    <td class="td-terms" colspan="3">4) No Claim will be entertained unless notified in writing within three days from the date of this bill.</td>
-    <td class="td-grand">GRAND TOTAL</td>
-    <td class="td-val" style="font-weight:700;"><input type="text" style="width:100%;text-align:right;font-weight:700;"></td>
-    <td class="td-p" style="font-weight:700;"><input type="text" style="width:100%;text-align:right;font-weight:700;"></td>
-  </tr>
+      <!-- TOTALS -->
+      <tr>
+        <td class="td-terms" colspan="3">Rupees: <input type="text" style="width:calc(100% - 50px);"
+            placeholder="Amount in words"></td>
+        <td class="td-lbl">TOTAL</td>
+        <td class="td-val"><input type="text" style="width:100%;text-align:right;"></td>
+        <td class="td-p"><input type="text" style="width:100%;text-align:right;"></td>
+      </tr>
+      <tr>
+        <td class="td-terms" colspan="3">1) Interest at 24% will be charged on bills if not paid on time</td>
+        <td class="td-lbl">C.G.S.T <input type="text" style="width:20px;text-align:center;"> %</td>
+        <td class="td-val"><input type="text" style="width:100%;text-align:right;"></td>
+        <td class="td-p"><input type="text" style="width:100%;text-align:right;"></td>
+      </tr>
+      <tr>
+        <td class="td-terms" colspan="3">2) We reserve the right to demand payment of this bill at any time</td>
+        <td class="td-lbl">S.G.S.T <input type="text" style="width:20px;text-align:center;"> %</td>
+        <td class="td-val"><input type="text" style="width:100%;text-align:right;"></td>
+        <td class="td-p"><input type="text" style="width:100%;text-align:right;"></td>
+      </tr>
+      <tr>
+        <td class="td-terms" colspan="3">3) Our responsibility ceases immediately the goods leave our premises</td>
+        <td class="td-lbl">Round off</td>
+        <td class="td-val"><input type="text" style="width:100%;text-align:right;"></td>
+        <td class="td-p"><input type="text" style="width:100%;text-align:right;"></td>
+      </tr>
+      <tr>
+        <td class="td-terms" colspan="3">4) No Claim will be entertained unless notified in writing within three days
+          from the date of this bill.</td>
+        <td class="td-grand">GRAND TOTAL</td>
+        <td class="td-val" style="font-weight:700;"><input type="text"
+            style="width:100%;text-align:right;font-weight:700;"></td>
+        <td class="td-p" style="font-weight:700;"><input type="text"
+            style="width:100%;text-align:right;font-weight:700;"></td>
+      </tr>
 
-  <!-- BOTTOM: Jurisdiction + Signature — no internal borders -->
-  <tr>
-    <td class="td-juris" colspan="3" style="border-right:1.5px solid #1a3160;">
-      <strong>Subject to Mumbai Jurisdiction</strong>
-      I/We hereby certify that my / our registration certificate under the GST Act 2017 is in force on the date on which the sale of the goods specified in this tax invoice / cash memorandum has been affected by me / us in the regular course of my / our business. Certified that the particulars given above are true and correct and the amount indicated represents the price actually charged and that there is no additional consideration directly or indirectly received.
-    </td>
-    <td class="td-eoe" colspan="1">E.&amp;O.E.</td>
-    <td class="td-forsig" colspan="2">
-      <div class="for-nee">For NEW EXCEL ENGINEERING</div>
-      <div class="partner">Partner</div>
-    </td>
-  </tr>
+      <!-- BOTTOM: Jurisdiction + Signature — no internal borders -->
+      <tr>
+        <td class="td-juris" colspan="3" style="border-right:1.5px solid #1a3160;">
+          <strong>Subject to Mumbai Jurisdiction</strong>
+          I/We hereby certify that my / our registration certificate under the GST Act 2017 is in force on the date on
+          which the sale of the goods specified in this tax invoice / cash memorandum has been affected by me / us in
+          the regular course of my / our business. Certified that the particulars given above are true and correct and
+          the amount indicated represents the price actually charged and that there is no additional consideration
+          directly or indirectly received.
+        </td>
+        <td class="td-eoe" colspan="1">E.&amp;O.E.</td>
+        <td class="td-forsig" colspan="2">
+          <div class="for-nee">For NEW EXCEL ENGINEERING</div>
+          <div class="partner">Partner</div>
+        </td>
+      </tr>
 
-</table><!-- /master -->
-</div><!-- /page -->
+    </table><!-- /master -->
+  </div><!-- /page -->
 
 </body>
+
 </html>
