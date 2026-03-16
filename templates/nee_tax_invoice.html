@@ -51,7 +51,6 @@
       color: #333;
     }
 
-    /* PAGE */
     .page {
       width: 210mm;
       background: #fff;
@@ -59,11 +58,12 @@
       box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
     }
 
-    /* KEY: single master table drives everything */
+    /* MASTER TABLE — single collapsed table, zero gaps */
     .master {
       width: 100%;
       border-collapse: collapse;
       border: 2px solid #1a3160;
+      table-layout: fixed;
     }
 
     .master td,
@@ -73,7 +73,6 @@
       vertical-align: middle;
     }
 
-    /* Remove double-borders at edges */
     .master tr:first-child td,
     .master tr:first-child th {
       border-top: none;
@@ -84,7 +83,7 @@
       border-left: none;
     }
 
-    /* ── LOGO ── */
+    /* LOGO */
     .td-logo {
       width: 70px;
       text-align: center;
@@ -127,7 +126,7 @@
       text-transform: uppercase;
     }
 
-    /* ── COMPANY DETAILS ── */
+    /* COMPANY */
     .td-company {
       text-align: center;
       padding: 5px 10px;
@@ -155,7 +154,7 @@
       line-height: 1.6;
     }
 
-    /* ── ADDRESS / BILL FIELDS ── */
+    /* FIELDS */
     .td-to {
       padding: 5px 8px;
       vertical-align: top;
@@ -201,7 +200,7 @@
       border-bottom-color: #1a3160;
     }
 
-    /* ── NOTICE ── */
+    /* NOTICE */
     .td-notice {
       text-align: center;
       font-size: 10px;
@@ -210,36 +209,7 @@
       padding: 3px 6px;
     }
 
-    /* ── COLUMN HEADERS ── */
-    .th-sr {
-      width: 28px;
-      text-align: center;
-    }
-
-    .th-part {
-      text-align: center;
-    }
-
-    .th-qty {
-      width: 52px;
-      text-align: center;
-    }
-
-    .th-rate {
-      width: 55px;
-      text-align: center;
-    }
-
-    .th-rs {
-      width: 54px;
-      text-align: center;
-    }
-
-    .th-p {
-      width: 26px;
-      text-align: center;
-    }
-
+    /* COLUMN HEADERS */
     .master th {
       font-family: 'Barlow Condensed', sans-serif;
       font-size: 12px;
@@ -247,42 +217,80 @@
       color: #1a3160;
       padding: 4px 3px;
       background: #fff;
+      text-align: center;
     }
 
-    /* ── ITEM ROWS ── */
+    /* ITEM ROWS — height is auto so rows grow with content */
     .tr-item td {
-      height: 21px;
+      height: auto;
+      min-height: 22px;
+      vertical-align: top;
+      padding: 0;
     }
 
+    /* Sr No cell */
     .td-sr-val {
       text-align: center;
       font-size: 9.5px;
       color: #333;
+      padding: 4px 2px;
+      vertical-align: middle;
+      width: 28px;
     }
 
-    .td-sr-val,
-    .td-input {
+    /* ── CONTENTEDITABLE for Particulars — wraps & grows ── */
+    .ce-particulars {
+      display: block;
+      width: 100%;
+      min-height: 21px;
+      padding: 3px 5px;
+      font-size: 10px;
+      font-family: 'Barlow', sans-serif;
+      color: #111;
+      line-height: 1.5;
+      word-break: break-word;
+      white-space: pre-wrap;
+      outline: none;
+      cursor: text;
+    }
+
+    .ce-particulars:empty::before {
+      content: attr(data-placeholder);
+      color: #bbb;
+      pointer-events: none;
+    }
+
+    /* On screen: subtle highlight when focused */
+    .ce-particulars:focus {
+      background: #fafcff;
+    }
+
+    /* Regular fixed-width input cells (qty, rate, amount) */
+    .td-num {
+      vertical-align: middle;
       padding: 0;
     }
 
-    .tr-item td input[type=text] {
+    .td-num input[type=text] {
       width: 100%;
-      border: none;
-      border-bottom: none;
-      padding: 1px 4px;
-      font-size: 10px;
       height: 100%;
+      min-height: 21px;
+      border: none;
+      padding: 2px 4px;
+      font-size: 10px;
+      text-align: right;
       display: block;
+      background: transparent;
     }
 
-    /* ── GSTIN ROW ── */
+    /* GSTIN row */
     .tr-gstin td {
       padding: 4px 8px;
       font-size: 10px;
       font-weight: 700;
     }
 
-    /* ── TOTALS ── */
+    /* TOTALS */
     .td-terms {
       font-size: 9px;
       color: #333;
@@ -305,8 +313,7 @@
       padding: 2px 4px;
     }
 
-    .td-val input[type=text],
-    .td-p input[type=text] {
+    .td-val input[type=text] {
       width: 100%;
       text-align: right;
     }
@@ -314,6 +321,11 @@
     .td-p {
       width: 26px;
       padding: 2px 3px;
+    }
+
+    .td-p input[type=text] {
+      width: 100%;
+      text-align: right;
     }
 
     .td-grand {
@@ -326,12 +338,12 @@
       padding: 4px 5px;
     }
 
-    /* ── BOTTOM ── */
+    /* BOTTOM */
     .td-juris {
       font-size: 8.5px;
       line-height: 1.6;
       color: #333;
-      padding: 4px 6px;
+      padding: 5px 8px;
       vertical-align: top;
     }
 
@@ -349,16 +361,16 @@
       font-size: 10px;
       font-weight: 600;
       color: #444;
-      width: 60px;
+      width: 55px;
       vertical-align: bottom;
-      padding-bottom: 4px;
+      padding: 4px 4px;
     }
 
     .td-forsig {
       text-align: right;
       width: 155px;
       vertical-align: top;
-      padding: 4px 0 4px 4px;
+      padding: 5px 8px;
     }
 
     .for-nee {
@@ -379,6 +391,7 @@
       text-align: center;
     }
 
+    /* ── PRINT ── */
     @media print {
       body {
         background: #fff;
@@ -394,6 +407,29 @@
         padding: 7mm;
       }
 
+      /* Make sure contenteditable content is fully visible when printing */
+      .ce-particulars {
+        background: transparent !important;
+        white-space: pre-wrap;
+        overflow: visible;
+        height: auto;
+        min-height: 0;
+      }
+
+      .ce-particulars:empty::before {
+        content: '';
+      }
+
+      /* Rows expand to show full content */
+      .tr-item td {
+        height: auto !important;
+        overflow: visible !important;
+      }
+
+      input[type=text] {
+        border-bottom: 1px solid #aaa;
+      }
+
       @page {
         size: A4;
         margin: 0;
@@ -406,33 +442,33 @@
 
   <div class="controls">
     <button class="btn-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
-    <button class="btn-clear" onclick="document.querySelectorAll('input').forEach(i=>i.value='')">🗑️ Clear All</button>
+    <button class="btn-clear" onclick="clearAll()">🗑️ Clear All</button>
   </div>
 
   <div class="page">
 
-    <!-- META (outside master table, no border) -->
+    <!-- META ROW (outside master table) -->
     <table style="width:100%;border-collapse:collapse;margin-bottom:1px;">
       <tr>
-        <td style="width:130px; border:none;"> </td>
+        <td style="border:none;width:130px;"> </td>
         <td
-          style="border:none; text-align:center; font-family:'Barlow Condensed',sans-serif; font-size:16px; font-weight:700; color:#1a3160; letter-spacing:3px;">
+          style="border:none;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;color:#1a3160;letter-spacing:3px;">
           TAX INVOICE</td>
         <td
-          style="border:none; text-align:right; font-size:9px; color:#222; line-height:1.6; white-space:nowrap; vertical-align:top;">
+          style="border:none;text-align:right;font-size:9px;color:#222;line-height:1.6;white-space:nowrap;vertical-align:top;">
           Mani - 8108968306 / 9820966832</td>
       </tr>
     </table>
 
-    <!-- MASTER TABLE: everything inside one collapsed-border table -->
+    <!-- MASTER TABLE -->
     <table class="master">
 
-      <!-- ROW 1: Logo + Company Name -->
+      <!-- ROW 1: Logo + Company -->
       <tr>
-        <td class="td-logo" rowspan="1">
+        <td class="td-logo" colspan="1">
           <div class="logo-outer">
             <div class="logo-inner">
-             <img src="{% static 'logo/nee_logo.png' %}" style="width: auto; height: 80px;"
+              <img src="{% static 'logo/nee_logo.png' %}" style="width: auto; height: 80px;"
                 alt="NEW EXCEL ENGINEERING Logo" class="logo">
             </div>
           </div>
@@ -469,155 +505,180 @@
 
       <!-- ROW 3: Notice -->
       <tr>
-        <td class="td-notice" colspan="6">
-          Please receive the following goods in good order and condition
-        </td>
+        <td class="td-notice" colspan="6">Please receive the following goods in good order and condition</td>
       </tr>
 
       <!-- ROW 4: Column headers -->
       <tr>
-        <th class="th-sr">Sr.<br>No.</th>
-        <th class="th-part">PARTICULARS</th>
-        <th class="th-qty">Qty.</th>
-        <th class="th-rate">Rate</th>
-        <th class="th-rs" colspan="2">Amount<br><span
-            style="font-size:10px;font-weight:600;letter-spacing:0;">Rs.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;P.</span></th>
+        <th style="width:28px;">Sr.<br>No.</th>
+        <th>PARTICULARS</th>
+        <th style="width:52px;">Qty.</th>
+        <th style="width:55px;">Rate</th>
+        <th style="width:54px;" colspan="2">Amount<br><span
+            style="font-size:10px;font-weight:600;">Rs.&nbsp;&nbsp;&nbsp;&nbsp;P.</span></th>
       </tr>
 
-      <!-- ITEM ROWS -->
+      <!-- ITEM ROWS: contenteditable Particulars, inputs for numbers -->
       <tr class="tr-item">
         <td class="td-sr-val">1</td>
-        <td class="td-input"><input type="text" style="width:100%;"></td>
-        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
-        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
-        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
-        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
+        <td>
+          <div class="ce-particulars" contenteditable="true" data-placeholder="Description of goods / work"></div>
+        </td>
+        <td class="td-num"><input type="text"></td>
+        <td class="td-num"><input type="text"></td>
+        <td class="td-num"><input type="text"></td>
+        <td class="td-num" style="width:26px;"><input type="text"></td>
       </tr>
       <tr class="tr-item">
         <td class="td-sr-val">2</td>
-        <td class="td-input"><input type="text" style="width:100%;"></td>
-        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
-        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
-        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
-        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
+        <td>
+          <div class="ce-particulars" contenteditable="true" data-placeholder=""></div>
+        </td>
+        <td class="td-num"><input type="text"></td>
+        <td class="td-num"><input type="text"></td>
+        <td class="td-num"><input type="text"></td>
+        <td class="td-num" style="width:26px;"><input type="text"></td>
       </tr>
       <tr class="tr-item">
         <td class="td-sr-val">3</td>
-        <td class="td-input"><input type="text" style="width:100%;"></td>
-        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
-        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
-        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
-        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
+        <td>
+          <div class="ce-particulars" contenteditable="true" data-placeholder=""></div>
+        </td>
+        <td class="td-num"><input type="text"></td>
+        <td class="td-num"><input type="text"></td>
+        <td class="td-num"><input type="text"></td>
+        <td class="td-num" style="width:26px;"><input type="text"></td>
       </tr>
       <tr class="tr-item">
         <td class="td-sr-val">4</td>
-        <td class="td-input"><input type="text" style="width:100%;"></td>
-        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
-        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
-        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
-        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
+        <td>
+          <div class="ce-particulars" contenteditable="true" data-placeholder=""></div>
+        </td>
+        <td class="td-num"><input type="text"></td>
+        <td class="td-num"><input type="text"></td>
+        <td class="td-num"><input type="text"></td>
+        <td class="td-num" style="width:26px;"><input type="text"></td>
       </tr>
       <tr class="tr-item">
         <td class="td-sr-val">5</td>
-        <td class="td-input"><input type="text" style="width:100%;"></td>
-        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
-        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
-        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
-        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
+        <td>
+          <div class="ce-particulars" contenteditable="true" data-placeholder=""></div>
+        </td>
+        <td class="td-num"><input type="text"></td>
+        <td class="td-num"><input type="text"></td>
+        <td class="td-num"><input type="text"></td>
+        <td class="td-num" style="width:26px;"><input type="text"></td>
       </tr>
       <tr class="tr-item">
         <td class="td-sr-val">6</td>
-        <td class="td-input"><input type="text" style="width:100%;"></td>
-        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
-        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
-        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
-        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
+        <td>
+          <div class="ce-particulars" contenteditable="true" data-placeholder=""></div>
+        </td>
+        <td class="td-num"><input type="text"></td>
+        <td class="td-num"><input type="text"></td>
+        <td class="td-num"><input type="text"></td>
+        <td class="td-num" style="width:26px;"><input type="text"></td>
       </tr>
       <tr class="tr-item">
         <td class="td-sr-val">7</td>
-        <td class="td-input"><input type="text" style="width:100%;"></td>
-        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
-        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
-        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
-        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
+        <td>
+          <div class="ce-particulars" contenteditable="true" data-placeholder=""></div>
+        </td>
+        <td class="td-num"><input type="text"></td>
+        <td class="td-num"><input type="text"></td>
+        <td class="td-num"><input type="text"></td>
+        <td class="td-num" style="width:26px;"><input type="text"></td>
       </tr>
       <tr class="tr-item">
         <td class="td-sr-val">8</td>
-        <td class="td-input"><input type="text" style="width:100%;"></td>
-        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
-        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
-        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
-        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
+        <td>
+          <div class="ce-particulars" contenteditable="true" data-placeholder=""></div>
+        </td>
+        <td class="td-num"><input type="text"></td>
+        <td class="td-num"><input type="text"></td>
+        <td class="td-num"><input type="text"></td>
+        <td class="td-num" style="width:26px;"><input type="text"></td>
       </tr>
       <tr class="tr-item">
         <td class="td-sr-val">9</td>
-        <td class="td-input"><input type="text" style="width:100%;"></td>
-        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
-        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
-        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
-        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
+        <td>
+          <div class="ce-particulars" contenteditable="true" data-placeholder=""></div>
+        </td>
+        <td class="td-num"><input type="text"></td>
+        <td class="td-num"><input type="text"></td>
+        <td class="td-num"><input type="text"></td>
+        <td class="td-num" style="width:26px;"><input type="text"></td>
       </tr>
       <tr class="tr-item">
         <td class="td-sr-val">10</td>
-        <td class="td-input"><input type="text" style="width:100%;"></td>
-        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
-        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
-        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
-        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
+        <td>
+          <div class="ce-particulars" contenteditable="true" data-placeholder=""></div>
+        </td>
+        <td class="td-num"><input type="text"></td>
+        <td class="td-num"><input type="text"></td>
+        <td class="td-num"><input type="text"></td>
+        <td class="td-num" style="width:26px;"><input type="text"></td>
       </tr>
       <tr class="tr-item">
         <td class="td-sr-val">11</td>
-        <td class="td-input"><input type="text" style="width:100%;"></td>
-        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
-        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
-        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
-        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
+        <td>
+          <div class="ce-particulars" contenteditable="true" data-placeholder=""></div>
+        </td>
+        <td class="td-num"><input type="text"></td>
+        <td class="td-num"><input type="text"></td>
+        <td class="td-num"><input type="text"></td>
+        <td class="td-num" style="width:26px;"><input type="text"></td>
       </tr>
       <tr class="tr-item">
         <td class="td-sr-val">12</td>
-        <td class="td-input"><input type="text" style="width:100%;"></td>
-        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
-        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
-        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
-        <td class="td-input"><input type="text" style="width:100%;text-align:right;"></td>
+        <td>
+          <div class="ce-particulars" contenteditable="true" data-placeholder=""></div>
+        </td>
+        <td class="td-num"><input type="text"></td>
+        <td class="td-num"><input type="text"></td>
+        <td class="td-num"><input type="text"></td>
+        <td class="td-num" style="width:26px;"><input type="text"></td>
       </tr>
 
       <!-- GSTIN -->
       <tr class="tr-gstin">
-        <td colspan="3" style="text-align:left;">GSTIN No.: 27AAHFN9441P1ZI</td>
-        <td colspan="3" style="text-align:right; padding:4px 8px; font-size:10px;">For <strong>NEW EXCEL
-            ENGINEERING</strong></td>
+        <td colspan="3" style="text-align:left; border-left:none;">GSTIN No.: 27AAHFN9441P1ZI</td>
+        <td colspan="3" style="text-align:right; padding:4px 8px; font-size:10px; font-weight:600;">For <strong>NEW
+            EXCEL ENGINEERING</strong></td>
       </tr>
 
       <!-- TOTALS -->
       <tr>
-        <td class="td-terms" colspan="3">Rupees: <input type="text" style="width:calc(100% - 50px);"
-            placeholder="Amount in words"></td>
+        <td class="td-terms" colspan="3" style="border-left:none;">Rupees: <input type="text"
+            style="width:calc(100% - 52px);" placeholder="Amount in words"></td>
         <td class="td-lbl">TOTAL</td>
         <td class="td-val"><input type="text" style="width:100%;text-align:right;"></td>
         <td class="td-p"><input type="text" style="width:100%;text-align:right;"></td>
       </tr>
       <tr>
-        <td class="td-terms" colspan="3">1) Interest at 24% will be charged on bills if not paid on time</td>
+        <td class="td-terms" colspan="3" style="border-left:none;">1) Interest at 24% will be charged on bills if not
+          paid on time</td>
         <td class="td-lbl">C.G.S.T <input type="text" style="width:20px;text-align:center;"> %</td>
         <td class="td-val"><input type="text" style="width:100%;text-align:right;"></td>
         <td class="td-p"><input type="text" style="width:100%;text-align:right;"></td>
       </tr>
       <tr>
-        <td class="td-terms" colspan="3">2) We reserve the right to demand payment of this bill at any time</td>
+        <td class="td-terms" colspan="3" style="border-left:none;">2) We reserve the right to demand payment of this
+          bill at any time</td>
         <td class="td-lbl">S.G.S.T <input type="text" style="width:20px;text-align:center;"> %</td>
         <td class="td-val"><input type="text" style="width:100%;text-align:right;"></td>
         <td class="td-p"><input type="text" style="width:100%;text-align:right;"></td>
       </tr>
       <tr>
-        <td class="td-terms" colspan="3">3) Our responsibility ceases immediately the goods leave our premises</td>
+        <td class="td-terms" colspan="3" style="border-left:none;">3) Our responsibility ceases immediately the goods
+          leave our premises</td>
         <td class="td-lbl">Round off</td>
         <td class="td-val"><input type="text" style="width:100%;text-align:right;"></td>
         <td class="td-p"><input type="text" style="width:100%;text-align:right;"></td>
       </tr>
       <tr>
-        <td class="td-terms" colspan="3">4) No Claim will be entertained unless notified in writing within three days
-          from the date of this bill.</td>
+        <td class="td-terms" colspan="3" style="border-left:none;">4) No Claim will be entertained unless notified in
+          writing within three days from the date of this bill.</td>
         <td class="td-grand">GRAND TOTAL</td>
         <td class="td-val" style="font-weight:700;"><input type="text"
             style="width:100%;text-align:right;font-weight:700;"></td>
@@ -625,26 +686,31 @@
             style="width:100%;text-align:right;font-weight:700;"></td>
       </tr>
 
-      <!-- BOTTOM: Jurisdiction + Signature — no internal borders -->
+      <!-- BOTTOM -->
       <tr>
-        <td class="td-juris" colspan="3" style="border-right:1.5px solid #1a3160;">
+        <td class="td-juris" colspan="3" style="border-left:none;">
           <strong>Subject to Mumbai Jurisdiction</strong>
           I/We hereby certify that my / our registration certificate under the GST Act 2017 is in force on the date on
           which the sale of the goods specified in this tax invoice / cash memorandum has been affected by me / us in
           the regular course of my / our business. Certified that the particulars given above are true and correct and
-          the amount indicated represents the price actually charged and that there is no additional consideration
-          directly or indirectly received.
+          the amount indicated represents the price actually charged.
         </td>
-        <td class="td-eoe" colspan="1">E.&amp;O.E.</td>
+        <td class="td-eoe">E.&amp;O.E.</td>
         <td class="td-forsig" colspan="2">
           <div class="for-nee">For NEW EXCEL ENGINEERING</div>
           <div class="partner">Partner</div>
         </td>
       </tr>
 
-    </table><!-- /master -->
-  </div><!-- /page -->
+    </table>
+  </div>
 
+  <script>
+    function clearAll() {
+      document.querySelectorAll('input[type=text]').forEach(i => i.value = '');
+      document.querySelectorAll('.ce-particulars').forEach(d => d.textContent = '');
+    }
+  </script>
 </body>
 
 </html>

@@ -63,6 +63,7 @@
       width: 100%;
       border-collapse: collapse;
       border: 2px solid #1a3160;
+      table-layout: fixed;
     }
 
     .master td,
@@ -93,7 +94,7 @@
       width: 58px;
       height: 58px;
       border-radius: 50%;
-      display: inline-flex;
+      =display: inline-flex;
       align-items: center;
       justify-content: center;
     }
@@ -102,7 +103,7 @@
       width: 46px;
       height: 46px;
       border-radius: 50%;
-      display: flex;
+      =display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
@@ -208,7 +209,7 @@
       padding: 3px 6px;
     }
 
-    /* HEADERS */
+    /* COLUMN HEADERS */
     .master th {
       font-family: 'Barlow Condensed', sans-serif;
       font-size: 12px;
@@ -216,25 +217,67 @@
       color: #1a3160;
       padding: 5px 3px;
       background: #fff;
+      text-align: center;
     }
 
-    /* ITEM ROWS */
+    /* ITEM ROWS — auto height, expands with content */
     .tr-item td {
-      height: 23px;
+      height: auto;
+      min-height: 22px;
+      vertical-align: top;
+      padding: 0;
     }
 
     .td-sr-val {
       text-align: center;
       font-size: 9.5px;
       color: #333;
+      padding: 4px 2px;
+      vertical-align: middle;
+      width: 28px;
     }
 
-    .tr-item td input[type=text] {
-      width: 100%;
-      border: none;
-      padding: 1px 4px;
-      font-size: 10px;
+    /* ── CONTENTEDITABLE Particulars ── */
+    .ce-particulars {
       display: block;
+      width: 100%;
+      min-height: 22px;
+      padding: 3px 5px;
+      font-size: 10px;
+      font-family: 'Barlow', sans-serif;
+      color: #111;
+      line-height: 1.5;
+      word-break: break-word;
+      white-space: pre-wrap;
+      outline: none;
+      cursor: text;
+    }
+
+    .ce-particulars:empty::before {
+      content: attr(data-placeholder);
+      color: #bbb;
+      pointer-events: none;
+    }
+
+    .ce-particulars:focus {
+      background: #fafcff;
+    }
+
+    /* Numeric cells */
+    .td-num {
+      vertical-align: middle;
+      padding: 0;
+    }
+
+    .td-num input[type=text] {
+      width: 100%;
+      min-height: 22px;
+      border: none;
+      padding: 2px 4px;
+      font-size: 10px;
+      text-align: right;
+      display: block;
+      background: transparent;
     }
 
     /* GSTIN */
@@ -244,7 +287,7 @@
       font-weight: 700;
     }
 
-    /* FOOTER outside table */
+    /* FOOTER strip */
     .footer-strip {
       display: flex;
       justify-content: space-between;
@@ -254,6 +297,7 @@
       color: #333;
     }
 
+    /* PRINT */
     @media print {
       body {
         background: #fff;
@@ -269,6 +313,27 @@
         padding: 7mm;
       }
 
+      .ce-particulars {
+        background: transparent !important;
+        white-space: pre-wrap;
+        overflow: visible;
+        height: auto;
+        min-height: 0;
+      }
+
+      .ce-particulars:empty::before {
+        content: '';
+      }
+
+      .tr-item td {
+        height: auto !important;
+        overflow: visible !important;
+      }
+
+      input[type=text] {
+        border-bottom: 1px solid #aaa;
+      }
+
       @page {
         size: A4;
         margin: 0;
@@ -281,7 +346,7 @@
 
   <div class="controls">
     <button class="btn-print" onclick="window.print()">🖨️ Print / Save as PDF</button>
-    <button class="btn-clear" onclick="document.querySelectorAll('input').forEach(i=>i.value='')">🗑️ Clear All</button>
+    <button class="btn-clear" onclick="clearAll()">🗑️ Clear All</button>
   </div>
 
   <div class="page">
@@ -346,126 +411,165 @@
 
       <!-- Column headers -->
       <tr>
-        <th style="width:28px; text-align:center;">Sr.<br>No.</th>
-        <th style="text-align:center;">PARTICULARS</th>
-        <th style="width:65px; text-align:center;">Qty.</th>
-        <th style="width:72px; text-align:center;">Rate</th>
+        <th style="width:28px;">Sr.<br>No.</th>
+        <th>PARTICULARS</th>
+        <th style="width:65px;">Qty.</th>
+        <th style="width:72px;">Rate</th>
       </tr>
 
-      <!-- 16 item rows -->
+      <!-- 16 item rows with contenteditable Particulars -->
       <tr class="tr-item">
         <td class="td-sr-val">1</td>
-        <td><input type="text" style="width:100%;"></td>
-        <td><input type="text" style="width:100%;text-align:right;padding-right:4px;"></td>
-        <td><input type="text" style="width:100%;text-align:right;padding-right:4px;"></td>
+        <td>
+          <div class="ce-particulars" contenteditable="true" data-placeholder="Description of goods / work"></div>
+        </td>
+        <td class="td-num"><input type="text"></td>
+        <td class="td-num"><input type="text"></td>
       </tr>
       <tr class="tr-item">
         <td class="td-sr-val">2</td>
-        <td><input type="text" style="width:100%;"></td>
-        <td><input type="text" style="width:100%;text-align:right;padding-right:4px;"></td>
-        <td><input type="text" style="width:100%;text-align:right;padding-right:4px;"></td>
+        <td>
+          <div class="ce-particulars" contenteditable="true" data-placeholder=""></div>
+        </td>
+        <td class="td-num"><input type="text"></td>
+        <td class="td-num"><input type="text"></td>
       </tr>
       <tr class="tr-item">
         <td class="td-sr-val">3</td>
-        <td><input type="text" style="width:100%;"></td>
-        <td><input type="text" style="width:100%;text-align:right;padding-right:4px;"></td>
-        <td><input type="text" style="width:100%;text-align:right;padding-right:4px;"></td>
+        <td>
+          <div class="ce-particulars" contenteditable="true" data-placeholder=""></div>
+        </td>
+        <td class="td-num"><input type="text"></td>
+        <td class="td-num"><input type="text"></td>
       </tr>
       <tr class="tr-item">
         <td class="td-sr-val">4</td>
-        <td><input type="text" style="width:100%;"></td>
-        <td><input type="text" style="width:100%;text-align:right;padding-right:4px;"></td>
-        <td><input type="text" style="width:100%;text-align:right;padding-right:4px;"></td>
+        <td>
+          <div class="ce-particulars" contenteditable="true" data-placeholder=""></div>
+        </td>
+        <td class="td-num"><input type="text"></td>
+        <td class="td-num"><input type="text"></td>
       </tr>
       <tr class="tr-item">
         <td class="td-sr-val">5</td>
-        <td><input type="text" style="width:100%;"></td>
-        <td><input type="text" style="width:100%;text-align:right;padding-right:4px;"></td>
-        <td><input type="text" style="width:100%;text-align:right;padding-right:4px;"></td>
+        <td>
+          <div class="ce-particulars" contenteditable="true" data-placeholder=""></div>
+        </td>
+        <td class="td-num"><input type="text"></td>
+        <td class="td-num"><input type="text"></td>
       </tr>
       <tr class="tr-item">
         <td class="td-sr-val">6</td>
-        <td><input type="text" style="width:100%;"></td>
-        <td><input type="text" style="width:100%;text-align:right;padding-right:4px;"></td>
-        <td><input type="text" style="width:100%;text-align:right;padding-right:4px;"></td>
+        <td>
+          <div class="ce-particulars" contenteditable="true" data-placeholder=""></div>
+        </td>
+        <td class="td-num"><input type="text"></td>
+        <td class="td-num"><input type="text"></td>
       </tr>
       <tr class="tr-item">
         <td class="td-sr-val">7</td>
-        <td><input type="text" style="width:100%;"></td>
-        <td><input type="text" style="width:100%;text-align:right;padding-right:4px;"></td>
-        <td><input type="text" style="width:100%;text-align:right;padding-right:4px;"></td>
+        <td>
+          <div class="ce-particulars" contenteditable="true" data-placeholder=""></div>
+        </td>
+        <td class="td-num"><input type="text"></td>
+        <td class="td-num"><input type="text"></td>
       </tr>
       <tr class="tr-item">
         <td class="td-sr-val">8</td>
-        <td><input type="text" style="width:100%;"></td>
-        <td><input type="text" style="width:100%;text-align:right;padding-right:4px;"></td>
-        <td><input type="text" style="width:100%;text-align:right;padding-right:4px;"></td>
+        <td>
+          <div class="ce-particulars" contenteditable="true" data-placeholder=""></div>
+        </td>
+        <td class="td-num"><input type="text"></td>
+        <td class="td-num"><input type="text"></td>
       </tr>
       <tr class="tr-item">
         <td class="td-sr-val">9</td>
-        <td><input type="text" style="width:100%;"></td>
-        <td><input type="text" style="width:100%;text-align:right;padding-right:4px;"></td>
-        <td><input type="text" style="width:100%;text-align:right;padding-right:4px;"></td>
+        <td>
+          <div class="ce-particulars" contenteditable="true" data-placeholder=""></div>
+        </td>
+        <td class="td-num"><input type="text"></td>
+        <td class="td-num"><input type="text"></td>
       </tr>
       <tr class="tr-item">
         <td class="td-sr-val">10</td>
-        <td><input type="text" style="width:100%;"></td>
-        <td><input type="text" style="width:100%;text-align:right;padding-right:4px;"></td>
-        <td><input type="text" style="width:100%;text-align:right;padding-right:4px;"></td>
+        <td>
+          <div class="ce-particulars" contenteditable="true" data-placeholder=""></div>
+        </td>
+        <td class="td-num"><input type="text"></td>
+        <td class="td-num"><input type="text"></td>
       </tr>
       <tr class="tr-item">
         <td class="td-sr-val">11</td>
-        <td><input type="text" style="width:100%;"></td>
-        <td><input type="text" style="width:100%;text-align:right;padding-right:4px;"></td>
-        <td><input type="text" style="width:100%;text-align:right;padding-right:4px;"></td>
+        <td>
+          <div class="ce-particulars" contenteditable="true" data-placeholder=""></div>
+        </td>
+        <td class="td-num"><input type="text"></td>
+        <td class="td-num"><input type="text"></td>
       </tr>
       <tr class="tr-item">
         <td class="td-sr-val">12</td>
-        <td><input type="text" style="width:100%;"></td>
-        <td><input type="text" style="width:100%;text-align:right;padding-right:4px;"></td>
-        <td><input type="text" style="width:100%;text-align:right;padding-right:4px;"></td>
+        <td>
+          <div class="ce-particulars" contenteditable="true" data-placeholder=""></div>
+        </td>
+        <td class="td-num"><input type="text"></td>
+        <td class="td-num"><input type="text"></td>
       </tr>
       <tr class="tr-item">
         <td class="td-sr-val">13</td>
-        <td><input type="text" style="width:100%;"></td>
-        <td><input type="text" style="width:100%;text-align:right;padding-right:4px;"></td>
-        <td><input type="text" style="width:100%;text-align:right;padding-right:4px;"></td>
+        <td>
+          <div class="ce-particulars" contenteditable="true" data-placeholder=""></div>
+        </td>
+        <td class="td-num"><input type="text"></td>
+        <td class="td-num"><input type="text"></td>
       </tr>
       <tr class="tr-item">
         <td class="td-sr-val">14</td>
-        <td><input type="text" style="width:100%;"></td>
-        <td><input type="text" style="width:100%;text-align:right;padding-right:4px;"></td>
-        <td><input type="text" style="width:100%;text-align:right;padding-right:4px;"></td>
+        <td>
+          <div class="ce-particulars" contenteditable="true" data-placeholder=""></div>
+        </td>
+        <td class="td-num"><input type="text"></td>
+        <td class="td-num"><input type="text"></td>
       </tr>
       <tr class="tr-item">
         <td class="td-sr-val">15</td>
-        <td><input type="text" style="width:100%;"></td>
-        <td><input type="text" style="width:100%;text-align:right;padding-right:4px;"></td>
-        <td><input type="text" style="width:100%;text-align:right;padding-right:4px;"></td>
+        <td>
+          <div class="ce-particulars" contenteditable="true" data-placeholder=""></div>
+        </td>
+        <td class="td-num"><input type="text"></td>
+        <td class="td-num"><input type="text"></td>
       </tr>
       <tr class="tr-item">
         <td class="td-sr-val">16</td>
-        <td><input type="text" style="width:100%;"></td>
-        <td><input type="text" style="width:100%;text-align:right;padding-right:4px;"></td>
-        <td><input type="text" style="width:100%;text-align:right;padding-right:4px;"></td>
+        <td>
+          <div class="ce-particulars" contenteditable="true" data-placeholder=""></div>
+        </td>
+        <td class="td-num"><input type="text"></td>
+        <td class="td-num"><input type="text"></td>
       </tr>
 
       <!-- GSTIN row -->
       <tr class="tr-gstin">
-        <td colspan="2" style="text-align:left;">GSTIN No.: 27AAHFN9441P1ZI</td>
+        <td colspan="2" style="border-left:none;">GSTIN No.: 27AAHFN9441P1ZI</td>
         <td colspan="2" style="text-align:right; padding:5px 8px; font-size:10px;">For <strong>NEW EXCEL
             ENGINEERING</strong></td>
       </tr>
 
-    </table><!-- /master -->
+    </table>
 
-    <!-- FOOTER STRIP (outside table, no border needed) -->
+    <!-- FOOTER STRIP -->
     <div class="footer-strip">
-      <div>Receiver's Signature &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;________________________________</div>
-      <div>Partner</div>
+      <span>Receiver's Signature &nbsp;&nbsp;&nbsp;&nbsp;________________________________</span>
+      <span>Partner</span>
     </div>
 
-  </div><!-- /page -->
+  </div>
+
+  <script>
+    function clearAll() {
+      document.querySelectorAll('input[type=text]').forEach(i => i.value = '');
+      document.querySelectorAll('.ce-particulars').forEach(d => d.textContent = '');
+    }
+  </script>
 </body>
 
 </html>
