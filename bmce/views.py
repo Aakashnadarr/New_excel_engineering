@@ -8,3 +8,10 @@ def home(request):
 
 def email(request):
     return render(request, 'email.html')
+
+def challan(request):
+    return render(request, 'nee_challan.html')
+
+def tax_invoice(request):
+    return render(request, 'nee_tax_invoice.html')
+
