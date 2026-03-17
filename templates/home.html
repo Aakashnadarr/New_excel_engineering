@@ -1,6 +1,7 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -37,7 +38,8 @@
         }
 
         .logo {
-            height: 100px; /* Adjust height as needed */
+            height: 100px;
+            /* Adjust height as needed */
             width: auto;
         }
 
@@ -69,13 +71,13 @@
             font-weight: 700;
             font-size: 1.1rem;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
             border: 1px solid #e1e8ed;
         }
 
         .card:hover {
             transform: translateY(-8px);
-            box-shadow: 0 12px 20px rgba(0,0,0,0.15);
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
             background-color: var(--accent-color);
             color: white;
             border-color: var(--accent-color);
@@ -92,18 +94,22 @@
                 flex-direction: column;
                 gap: 10px;
             }
+
             .logo {
                 height: 60px;
             }
+
             h1 {
                 font-size: 1.6rem;
             }
+
             .container {
                 grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
+
 <body>
 
     <header>
@@ -124,11 +130,12 @@
             <span class="icon">📝</span>
             Challan
         </a>
-        <a href="#" class="card">
+        <a href="{% url 'eway' %}" class="card">
             <span class="icon">🚛</span>
             E-Way Bill
         </a>
     </div>
 
 </body>
+
 </html>

@@ -9,6 +9,11 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+import time
 
 logger = logging.getLogger(__name__)
 
@@ -152,3 +157,29 @@ def parse_parts(service, msg_id, payload):
 
     recurse(payload)
     return body, attachments
+
+def scrape_gst_details(gst_number: str) -> dict:
+    options = webdriver.ChromeOptions()
+    options.add_argument("--headless")
+    options.add_argument("--disable-gpu")
+    options.add_argument("--window-size=1920,1080")
+
+    with webdriver.Chrome(options=options) as driver:
+        url = "https://cleartax.in/gst-number-search/"
+        driver.get(url)
+
+        try:
+            wait = WebDriverWait(driver, 15)
+            input_field = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, r"input[placeholder*='Enter company name or GSTIN']")))
+            input_field.send_keys(gst_number)
+            search_btn = driver.find_element(By.CSS_SELECTOR, r"#__next > div > div.wg-container.relative > div.mt-20.w-3\/4.sm\:w-full.sm\:mt-12 > div:nth-child(3) > div:nth-child(2) > div > button")
+            search_btn.click()
+            details_container = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, r"#__next > div > div.wg-container.relative > div.mt-20.w-3\/4.sm\:w-full.sm\:mt-12 > div:nth-child(3) > div.my-10.relative > div.bg-white.w-full.z-10 > div > div")))
+        
+            lines = [line.strip() for line in details_container.text.split("\n") if line.strip()]
+            data = dict(zip(lines[0::2], lines[1::2]))
+            data["scraped_at"] = time.strftime("%Y-%m-%d %H:%M:%S")
+            return data
+
+        except Exception as e:
+            return {"error": f"Scraping failed: {str(e)}"}

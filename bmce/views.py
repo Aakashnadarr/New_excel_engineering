@@ -15,3 +15,5 @@ def challan(request):
 def tax_invoice(request):
     return render(request, 'nee_tax_invoice.html')
 
+def eway(request):
+    return render(request, 'nee_eway.html')

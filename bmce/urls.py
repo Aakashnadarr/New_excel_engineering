@@ -7,4 +7,5 @@ urlpatterns = [
     path('email/', email, name='email'),
     path('challan/', challan, name='challan'),  
     path('bill/', tax_invoice, name='tax_invoice'),
+    path('eway/', eway, name='eway'),
 ]
