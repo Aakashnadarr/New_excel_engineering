@@ -8,4 +8,5 @@ urlpatterns = [
     path('bill/', tax_invoice, name='tax_invoice'),
     path('attendance/', attendance, name='attendance'),
     path('attendance/report/<int:worker_id>/', worker_report, name='worker_report'),
+    path('attendance/export/<int:worker_id>/', export_worker_attendance_csv, name='export_worker_attendance_csv'),
 ]

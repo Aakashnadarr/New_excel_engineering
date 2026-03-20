@@ -5,6 +5,8 @@ import base64
 from django.shortcuts import render, redirect
 from django.utils import timezone
 from .models import *
+import openpyxl
+from django.http import HttpResponse
 
 from django.shortcuts import render, redirect
 from django.utils import timezone
@@ -17,10 +19,8 @@ def attendance(request):
         worker = Worker.objects.get(id=worker_id)
 
         if action == "enter":
-            # Create a new attendance record for entry
             Attendance.objects.create(worker=worker, entry_time=timezone.now())
         elif action == "exit":
-            # Find the active session and set the exit time
             latest_record = Attendance.objects.filter(worker=worker, exit_time__isnull=True).last()
             if latest_record:
                 latest_record.exit_time = timezone.now()
@@ -52,13 +52,44 @@ def worker_report(request, worker_id):
     worker = Worker.objects.get(id=worker_id)
     logs = Attendance.objects.filter(worker=worker).order_by('-entry_time')
     
-    # Calculate the total hours across all finished sessions
-    total_cumulative_time = sum(log.get_duration() for log in logs)
+    total_seconds = 0
+    for log in logs:
+        end_time = log.exit_time or timezone.now()
+        total_seconds += (end_time - log.entry_time).total_seconds()
     
-    context = {
+    total_seconds = int(total_seconds)
+    total_hours = total_seconds // 3600
+    remaining_minutes = (total_seconds % 3600) // 60
+    remaining_seconds = total_seconds % 60
+    
+    overall_time_str = f"{total_hours}h {remaining_minutes}m {remaining_seconds}s"
+    
+    return render(request, 'worker_report.html', {
         'worker': worker,
         'logs': logs,
-        'total_cumulative_time': round(total_cumulative_time, 2)
-    }
-    return render(request, 'worker_report.html', context)
+        'overall_total_time': overall_time_str
+    })
 
+def export_worker_attendance_csv(request, worker_id):
+    worker = Worker.objects.get(id=worker_id)
+    logs = Attendance.objects.filter(worker=worker).order_by('-entry_time')
+
+    writer = openpyxl.Workbook()
+    sheet = writer.active
+    sheet.title = f"{worker.name} Attendance Report"
+    sheet.append(['Entry Time', 'Exit Time', 'Duration'])
+    for log in logs:
+        entry_time = log.entry_time.strftime('%Y-%m-%d %H:%M:%S')
+        exit_time = log.exit_time.strftime('%Y-%m-%d %H:%M:%S') if log.exit_time else 'N/A'
+        duration = log.get_duration()
+        sheet.append([entry_time, exit_time, duration])
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = f'attachment; filename="{worker.name}_attendance_report.xlsx"'
+    
+    for column_cells in sheet.columns:
+        length = max(len(str(cell.value)) for cell in column_cells)
+        sheet.column_dimensions[column_cells[0].column_letter].width = length + 2
+
+    writer.save(response)
+
+    return response

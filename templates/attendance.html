@@ -1,12 +1,14 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Worker Attendance | NEE</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
+
 <body class="bg-slate-100 p-6 md:p-12">
     <div class="max-w-4xl mx-auto">
         <div class="flex justify-between items-center mb-8">
@@ -18,9 +20,12 @@
             <table class="w-full text-left">
                 <thead class="bg-slate-50 border-b border-slate-200">
                     <tr>
-                        <th class="px-6 py-4 text-sm font-semibold text-slate-600 uppercase tracking-wider">Worker Name</th>
-                        <th class="px-6 py-4 text-sm font-semibold text-slate-600 uppercase tracking-wider">Current Status</th>
-                        <th class="px-6 py-4 text-sm font-semibold text-slate-600 text-right uppercase tracking-wider">Action</th>
+                        <th class="px-6 py-4 text-sm font-semibold text-slate-600 uppercase tracking-wider">Worker Name
+                        </th>
+                        <th class="px-6 py-4 text-sm font-semibold text-slate-600 uppercase tracking-wider">Current
+                            Status</th>
+                        <th class="px-6 py-4 text-sm font-semibold text-slate-600 text-right uppercase tracking-wider">
+                            Action</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">
@@ -28,23 +33,24 @@
                     <tr class="hover:bg-slate-50 transition-colors">
                         <td class="px-6 py-4">
                             <div class="font-bold text-slate-800 text-lg">{{ worker.name }}</div>
-                            <a href="{% url 'worker_report' worker.id %}" class="text-blue-500 text-[10px] font-extrabold uppercase tracking-tight hover:underline">
+                            <a href="{% url 'worker_report' worker.id %}"
+                                class="text-blue-500 text-[10px] font-extrabold uppercase tracking-tight hover:underline">
                                 View Attendance Sheet
                             </a>
                         </td>
                         <td class="px-6 py-4">
                             {% if worker.is_present %}
-                                <div class="flex items-center gap-2">
-                                    <span class="h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
-                                    <span class="text-green-600 text-xs font-bold uppercase">
-                                        Inside (Entered at {{ worker.current_session.entry_time|time:"H:i" }})
-                                    </span>
-                                </div>
+                            <div class="flex items-center gap-2">
+                                <span class="h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
+                                <span class="text-green-600 text-xs font-bold uppercase">
+                                    Inside (Entered at {{ worker.current_session.entry_time|time:"H:i" }})
+                                </span>
+                            </div>
                             {% else %}
-                                <div class="flex items-center gap-2">
-                                    <span class="h-2 w-2 rounded-full bg-slate-300"></span>
-                                    <span class="text-slate-400 text-xs font-bold uppercase">Outside</span>
-                                </div>
+                            <div class="flex items-center gap-2">
+                                <span class="h-2 w-2 rounded-full bg-slate-300"></span>
+                                <span class="text-slate-400 text-xs font-bold uppercase">Outside</span>
+                            </div>
                             {% endif %}
                         </td>
                         <td class="px-6 py-4 text-right">
@@ -52,13 +58,15 @@
                                 {% csrf_token %}
                                 <input type="hidden" name="worker_id" value="{{ worker.id }}">
                                 {% if worker.is_present %}
-                                    <button name="action" value="exit" class="bg-red-50 text-red-600 border border-red-200 px-6 py-2 rounded-lg font-bold hover:bg-red-600 hover:text-white transition-all shadow-sm">
-                                        Punch Out
-                                    </button>
+                                <button name="action" value="exit"
+                                    class="bg-red-50 text-red-600 border border-red-200 px-6 py-2 rounded-lg font-bold hover:bg-red-600 hover:text-white transition-all shadow-sm">
+                                    Punch Out
+                                </button>
                                 {% else %}
-                                    <button name="action" value="enter" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-700 transition-all shadow-md active:transform active:scale-95">
-                                        Punch In
-                                    </button>
+                                <button name="action" value="enter"
+                                    class="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-700 transition-all shadow-md active:transform active:scale-95">
+                                    Punch In
+                                </button>
                                 {% endif %}
                             </form>
                         </td>
@@ -73,10 +81,11 @@
                 </tbody>
             </table>
         </div>
-        
+
         <p class="mt-4 text-center text-slate-400 text-xs font-medium">
             New Excel Engineering - Internal Workshop Management
         </p>
     </div>
 </body>
+
 </html>
