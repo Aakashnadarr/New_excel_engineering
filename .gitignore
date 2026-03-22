@@ -9,3 +9,5 @@ __pycache__/
 *.log
 *.env
 token.json
+.k8s/
+.terraform/

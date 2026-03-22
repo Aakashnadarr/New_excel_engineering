@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: new-excel-service
+spec:
+  selector:
+    app: new-excel # This MUST match the label in the deployment above
+  ports:
+    - protocol: TCP
+      port: 80       # Port the public sees
+      targetPort: 80 # Port inside your container
+  type: LoadBalancer

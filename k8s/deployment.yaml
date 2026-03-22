@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: new-excel-web-deployment
+  namespace: default
+  labels:
+    app: new-excel
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: new-excel
+  template:
+    metadata:
+      labels:
+        app: new-excel
+    spec:
+      # Fargate does not support 'Host' networking, so we use default
+      containers:
+      - name: website-container
+        image: 575894693774.dkr.ecr.ap-south-1.amazonaws.com/new_excel_engineering:latest
+        ports:
+        - containerPort: 80
+        
+        # CRITICAL FOR FARGATE: 
+        # AWS needs to know exactly how much to charge you.
+        # If these are missing, the Pod will stay in 'Pending' forever.
+        resources:
+          requests:
+            cpu: "256m"    # 0.25 vCPU
+            memory: "512Mi" # 512 MB RAM
+          limits:
+            cpu: "500m"    # 0.5 vCPU
+            memory: "1Gi"   # 1 GB RAM
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: new-excel-service
+spec:
+  selector:
+    app: new-excel
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: LoadBalancer
